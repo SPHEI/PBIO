@@ -8,7 +8,7 @@
 * React 
 * Node.js
 * Express 
-* PostgreSQL 
-* Prisma/Drizzle
+* SQLite
+* Prisma
 ## Opis
 Aplikacja webowa do monitorowania zysków oraz wydatków w celu lepszego budżetowania. Użytkownik będzie mógł zapisywać swoje zyski/wydatki, po czym sprawdzać swój balans oraz proste statystyki np. średni balans na miesiąc.
