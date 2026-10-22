@@ -11,9 +11,16 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Test route
+app.get('/', (req, res) => {
+  res.json({message: "Welcome to the backend. Functions available under /api"});
+});
+
 app.get('/api', (req, res) => {
-  res.json({ message: 'Notes API is running successfully!' });
+  res.json({message: "Welcome to the api."});
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({status: "ok"});
 });
 
 // Mount user routes (e.g., /api/users, /api/register)
