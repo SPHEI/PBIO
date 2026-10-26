@@ -12,4 +12,17 @@ model User {
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
+  admin     Boolean  @default(false)
+  entries   Entry[]
+}
+
+
+model Entry{
+  id       String   @id @default(uuid())
+  user_id  String
+  user     User     @relation(fields: [user_id], references: [id])
+  name     String   @default("Transfer")
+  amount   Float
+  date     DateTime @default(now())
+  income   Boolean  @default(false)
 }
