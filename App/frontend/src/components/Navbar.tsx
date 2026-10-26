@@ -52,7 +52,7 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
       {!loggedIn && <button onClick={() => setCurrentView('login')} style={navBtnStyle(currentView === 'login')}>Login</button>}
       {!loggedIn && <button onClick={() => setCurrentView('register')} style={navBtnStyle(currentView === 'register')}>Register</button>}
       {admin && <button onClick={() => setCurrentView('dashboard')} style={navBtnStyle(currentView === 'dashboard')}>Users Dashboard</button>}
-      {loggedIn && <button onClick={() => setCurrentView('entries')} style={navBtnStyle(currentView === 'entries')}>Entries</button>}
+      {loggedIn && !admin && <button onClick={() => setCurrentView('entries')} style={navBtnStyle(currentView === 'entries')}>Entries</button>}
       {loggedIn && <button onClick={logout} style={navBtnStyle(false)}>Logout</button>}
     </nav>
   );

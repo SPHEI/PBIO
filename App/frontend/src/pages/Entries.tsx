@@ -105,6 +105,17 @@ export function Entries() {
     }
   };
 
+  // Calculate totals
+  const totalIncome = entries
+    .filter((e) => e.income)
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const totalExpense = entries
+    .filter((e) => !e.income)
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const balance = totalIncome - totalExpense;
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -115,6 +126,24 @@ export function Entries() {
         >
           + Add New Entry
         </button>
+      </div>
+
+      {/* Balance Summary Card */}
+      <div style={{ display: 'flex', gap: '15px', marginBottom: '2rem' }}>
+        <div style={{ flex: 1, background: '#f1f3f5', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', color: '#666' }}>Total Balance</span>
+          <h3 style={{ margin: '5px 0 0 0', color: balance >= 0 ? '#28a745' : '#dc3545' }}>
+            ${balance.toFixed(2)}
+          </h3>
+        </div>
+        <div style={{ flex: 1, background: '#e6f4ea', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', color: '#137333' }}>Total Income</span>
+          <h3 style={{ margin: '5px 0 0 0', color: '#137333' }}>+${totalIncome.toFixed(2)}</h3>
+        </div>
+        <div style={{ flex: 1, background: '#fce8e6', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', color: '#c5221f' }}>Total Expense</span>
+          <h3 style={{ margin: '5px 0 0 0', color: '#c5221f' }}>-${totalExpense.toFixed(2)}</h3>
+        </div>
       </div>
 
       {/* Modal Popup Overlay */}

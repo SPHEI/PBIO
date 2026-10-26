@@ -6,25 +6,8 @@ import { verifyToken, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// 1. GET: Fetch all users (PROTECTED ROUTE - requires token)
-router.get('/users', verifyToken, async (req: AuthRequest, res: Response) => {
-  try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        createdAt: true,
-        // Exclude password from the response for security!
-      },
-    });
-    res.json(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
-// 2. POST: Create a new user (Sign Up) with password hashing
+// 1. POST: Create a new user (Sign Up) with password hashing
 router.post('/register', async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
@@ -65,7 +48,7 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-// 3. POST: Log in an existing user and return a JWT token
+// 2. POST: Log in an existing user and return a JWT token
 router.post('/login', async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
