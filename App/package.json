@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "setup_env": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env')) { fs.writeFileSync('.env', 'DATABASE_URL=\"file:./dev.db\"\\nJWT_SECRET=\"super_secure_jwt_secret_key_123\"\\nDEFAULT_ADMIN_PASSWORD=\"admin\"\\n'); console.log('.env file created successfully.'); } else { console.log('.env file already exists.'); }\"",
+    "setup_env": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env')) { fs.copyFileSync('.env.example', '.env'); console.log('.env file created successfully from example.env.'); } else { console.log('.env file already exists.'); }\"",
     "install_all": "npm run setup_env && npm install && npm install --prefix frontend",
     "server": "npx prisma db push && tsx watch backend/server.ts",
     "client": "npm run dev --prefix frontend",
