@@ -9,6 +9,7 @@ import { Account } from './pages/Account';
 
 function App() {
   const [currentView, setCurrentView] = useState<string>('home');
+  const [selectedUserId, setSelectedUserId] = useState<string>('home');
   const [message, setMessage] = useState<string>('Loading...');
 
   useEffect(() => {
@@ -25,8 +26,8 @@ function App() {
       {currentView === 'home' && <Home message={message} />}
       {currentView === 'login' && <Login setCurrentView={setCurrentView} />}
       {currentView === 'register' && <Register setCurrentView={setCurrentView} />}
-      {currentView === 'dashboard' && <UsersDashboard />}
-      {currentView === 'entries' && <Entries />}
+      {currentView === 'dashboard' && <UsersDashboard setCurrentView={setCurrentView} setSelectedUserId={setSelectedUserId}/>}
+      {currentView === 'entries' && <Entries selectedUserId={selectedUserId} />}
       {currentView === 'account' && <Account setCurrentView={setCurrentView} />}
     </div>
   );

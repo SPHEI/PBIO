@@ -8,7 +8,11 @@ interface Entry {
   income: boolean;
 }
 
-export function Entries() {
+
+interface EntriesProps {
+  selectedUserId: string;
+}
+export function Entries({selectedUserId} : EntriesProps) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [name, setName] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
@@ -21,7 +25,12 @@ export function Entries() {
   const fetchEntries = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/entries', {
+      let userId = '';
+      if(localStorage.getItem('admin') !== null)
+      {
+        userId = "?userId=" + selectedUserId;
+      }
+      const response = await fetch('/api/entries' + userId, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -48,6 +57,11 @@ export function Entries() {
 
     try {
       const token = localStorage.getItem('token');
+      let userId = null;
+      if(localStorage.getItem('admin') !== null)
+      {
+        userId = selectedUserId;
+      }
       const response = await fetch('/api/entries', {
         method: 'POST',
         headers: {
@@ -59,6 +73,7 @@ export function Entries() {
           amount: parseFloat(amount),
           income,
           date: date ? new Date(date).toISOString() : undefined,
+          targetUserId: userId
         }),
       });
 
