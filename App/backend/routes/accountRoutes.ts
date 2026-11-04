@@ -94,4 +94,82 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 });
 
+// 3. PUT: Change password for the logged-in user
+router.put('/password', verifyToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user!.userId;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'Old password and new password are required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify old password
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Incorrect old password' });
+    }
+
+    // Hash the new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update password in database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedNewPassword },
+    });
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 4. DELETE: Delete user account and associated entries, requiring current password
+router.delete('/account', verifyToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const { password } = req.body;
+    const userId = req.user!.userId;
+
+    if (!password) {
+      return res.status(400).json({ error: 'Current password is required to delete your account' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Incorrect password' });
+    }
+
+    // Delete associated entries and user account in a transaction
+    await prisma.$transaction([
+      prisma.entry.deleteMany({ where: { user_id: userId } }),
+      prisma.user.delete({ where: { id: userId } }),
+    ]);
+
+    res.json({ message: 'Account and associated data deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

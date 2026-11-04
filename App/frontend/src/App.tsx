@@ -5,6 +5,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { UsersDashboard } from './pages/UsersDashboard';
 import { Entries } from './pages/Entries';
+import { Account } from './pages/Account';
 
 function App() {
   const [currentView, setCurrentView] = useState<string>('home');
@@ -26,6 +27,7 @@ function App() {
       {currentView === 'register' && <Register setCurrentView={setCurrentView} />}
       {currentView === 'dashboard' && <UsersDashboard />}
       {currentView === 'entries' && <Entries />}
+      {currentView === 'account' && <Account setCurrentView={setCurrentView} />}
     </div>
   );
 }

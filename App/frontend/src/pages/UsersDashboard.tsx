@@ -15,7 +15,7 @@ export function UsersDashboard() {
         const response = await fetch('/api/users', {
             method: 'GET',
             headers: {
-            'Authorization': `Bearer ${token}` // Pass the token in the header
+            'Authorization': `Bearer ${token}`
             }
         });
         const data = await response.json();

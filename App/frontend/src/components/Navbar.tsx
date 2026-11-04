@@ -25,9 +25,8 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
   };
 
   useEffect(() => {
-    refresh(); // Check on mount
+    refresh(); 
 
-    // Listen for custom auth-change events
     const handleAuthChange = () => refresh();
     window.addEventListener('auth-change', handleAuthChange);
 
@@ -40,8 +39,7 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
     localStorage.removeItem('username');
     localStorage.removeItem('token');
     localStorage.removeItem('admin');
-    
-    // Notify the app that auth state changed
+
     window.dispatchEvent(new Event('auth-change'));
     setCurrentView('home');
   };
@@ -53,6 +51,7 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
       {!loggedIn && <button onClick={() => setCurrentView('register')} style={navBtnStyle(currentView === 'register')}>Register</button>}
       {admin && <button onClick={() => setCurrentView('dashboard')} style={navBtnStyle(currentView === 'dashboard')}>Users Dashboard</button>}
       {loggedIn && !admin && <button onClick={() => setCurrentView('entries')} style={navBtnStyle(currentView === 'entries')}>Entries</button>}
+      {loggedIn && <button onClick={() => setCurrentView('account')} style={navBtnStyle(false)}>Account</button>}
       {loggedIn && <button onClick={logout} style={navBtnStyle(false)}>Logout</button>}
     </nav>
   );

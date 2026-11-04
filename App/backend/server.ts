@@ -33,13 +33,11 @@ app.use('/api', adminRoutes);
 
 async function createDefaultAdmin() {
   try {
-    // Check if any admin user already exists in the database
     const existingAdmin = await prisma.user.findFirst({
       where: { admin: true },
     });
 
     if (!existingAdmin) {
-      // Pull password from .env or fallback to 'admin123'
       const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
       const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
