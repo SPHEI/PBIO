@@ -20,7 +20,29 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api', (req, res) => {
-  res.json({message: "Welcome to the api."});
+  res.json({
+    message: "Welcome to the api. Here you can see all available routes.",
+    base: [
+      "GET  / - Welcome message",
+      "GET  /api - Route list",
+      "GET  /api/health - Server status"
+    ],
+    accountRoutes: [
+      "POST   /api/register - Creates a new user",
+      "POST   /api/login - Logs in",
+      "PUT    /api/password - Changes password",
+      "DELETE /api/account - Deletes account"
+    ],
+    entryRoutes: [
+      "POST   /api/entries - Creates a new entry",
+      "DELETE /api/entries - Deletes an entry",
+      "GET    /api/entries - Get all entries of a user" 
+    ],
+    adminRoutes: [
+      "GET    /api/users - Gets a list of all users",
+      "DELETE /api/users - Deletes a user"
+    ]
+  });
 });
 
 app.get('/api/health', (req, res) => {
