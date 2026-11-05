@@ -12,34 +12,54 @@ export function Register({ setCurrentView }: RegisterProps) {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRegStatus('Registering...');
+    setRegStatus('');
 
+    // Password validation rules
+    if (password.length < 6) {
+      setRegStatus('Error: Password must be at least 6 characters long');
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setRegStatus('Error: Password must contain at least 1 uppercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setRegStatus('Error: Password must contain at least 1 number');
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      setRegStatus('Error: Password must contain at least 1 special symbol');
+      return;
+    }
     if (password !== repassword) {
       setRegStatus("Error: Passwords don't match");
-    } else {
-      try {
-        const response = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
+      return;
+    }
 
-        const data = await response.json();
+    setRegStatus('Registering...');
 
-        if (response.ok) {
-          setRegStatus(`Success! User created with ID: ${data.userId}`);
-          setUsername('');
-          setPassword('');
-          setRepassword('');
-          alert('Account created successfully.');
-          
-          setCurrentView("login");
-        } else {
-          setRegStatus(`Error: ${data.error}`);
-        }
-      } catch (err) {
-        setRegStatus('Error connecting to server');
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setRegStatus(`Success! User created with ID: ${data.userId}`);
+        setUsername('');
+        setPassword('');
+        setRepassword('');
+        alert('Account created successfully.');
+        
+        setCurrentView("login");
+      } else {
+        setRegStatus(`Error: ${data.error}`);
       }
+    } catch (err) {
+      setRegStatus('Error connecting to server');
     }
   };
 

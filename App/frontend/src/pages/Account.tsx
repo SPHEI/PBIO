@@ -18,13 +18,25 @@ export function Account({ setCurrentView }: AccountProps) {
     e.preventDefault();
     setPasswordStatus(null);
 
-    if (newPassword !== confirmNewPassword) {
-      setPasswordStatus({ type: 'error', msg: 'New passwords do not match' });
-      return;
-    }
-
+    // Password validation rules
     if (newPassword.length < 6) {
       setPasswordStatus({ type: 'error', msg: 'New password must be at least 6 characters long' });
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      setPasswordStatus({ type: 'error', msg: 'New password must contain at least 1 uppercase letter' });
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      setPasswordStatus({ type: 'error', msg: 'New password must contain at least 1 number' });
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(newPassword)) {
+      setPasswordStatus({ type: 'error', msg: 'New password must contain at least 1 special symbol' });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordStatus({ type: 'error', msg: 'New passwords do not match' });
       return;
     }
 

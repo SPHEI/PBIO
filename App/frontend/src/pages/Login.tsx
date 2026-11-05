@@ -30,7 +30,14 @@ export function Login({ setCurrentView }: LoginProps) {
           localStorage.setItem('admin', data.username);
         }
         window.dispatchEvent(new Event('auth-change'));
-        setCurrentView("home");
+        if (data.admin === true) 
+        {
+          setCurrentView("dashboard");
+        }
+        else
+        {
+          setCurrentView("entries");
+        }
       } else {
         setLoginStatus(`Error: ${data.error || 'Invalid credentials'}`);
       }

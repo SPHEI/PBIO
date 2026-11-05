@@ -6,6 +6,22 @@ import { verifyToken, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
+// Helper function to validate password strength
+const validatePassword = (password: string): string | null => {
+  if (password.length < 6) {
+    return 'Password must be at least 6 characters long';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'Password must contain at least 1 uppercase letter';
+  }
+  if (!/[0-9]/.test(password)) {
+    return 'Password must contain at least 1 number';
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return 'Password must contain at least 1 special symbol';
+  }
+  return null;
+};
 
 // 1. POST: Create a new user (Sign Up) with password hashing
 router.post('/register', async (req: Request, res: Response) => {
@@ -14,6 +30,12 @@ router.post('/register', async (req: Request, res: Response) => {
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    // Validate password rules
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return res.status(400).json({ error: passwordError });
     }
 
     // Check if user already exists
@@ -102,6 +124,12 @@ router.put('/password', verifyToken, async (req: AuthRequest, res: Response) => 
 
     if (!oldPassword || !newPassword) {
       return res.status(400).json({ error: 'Old password and new password are required' });
+    }
+
+    // Validate new password rules
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ error: passwordError });
     }
 
     const user = await prisma.user.findUnique({
