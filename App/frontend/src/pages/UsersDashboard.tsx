@@ -59,7 +59,7 @@ export function UsersDashboard({ setCurrentView, setSelectedUserId }: UsersDashb
         alert(data.error || 'Failed to delete user');
       }
     } catch (err) {
-      alert('Error connecting to server');
+      alert(`Error connecting to server\n ${err}`);
     }
   };
 

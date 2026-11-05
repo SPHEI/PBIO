@@ -71,7 +71,7 @@ export function Account({ setCurrentView }: AccountProps) {
         setPasswordStatus({ type: 'error', msg: data.error || 'Failed to update password' });
       }
     } catch (err) {
-      setPasswordStatus({ type: 'error', msg: 'Error connecting to server' });
+      setPasswordStatus({ type: 'error', msg: 'Error connecting to server ' + err });
     }
   };
 
@@ -104,7 +104,7 @@ export function Account({ setCurrentView }: AccountProps) {
         setShowDeleteConfirmModal(false);
       }
     } catch (err) {
-      setDeleteStatus({ type: 'error', msg: 'Error connecting to server' });
+      setDeleteStatus({ type: 'error', msg: 'Error connecting to server ' + err });
       setShowDeleteConfirmModal(false);
     }
   };

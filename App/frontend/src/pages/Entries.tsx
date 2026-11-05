@@ -41,7 +41,7 @@ export function Entries({ selectedUserId }: EntriesProps) {
         setStatus(`Error: ${data.error || 'Failed to load entries'}`);
       }
     } catch (err) {
-      setStatus('Error connecting to server');
+      setStatus('Error connecting to server ' + err);
     }
   };
 
@@ -89,7 +89,7 @@ export function Entries({ selectedUserId }: EntriesProps) {
         setStatus(`Error: ${data.error}`);
       }
     } catch (err) {
-      setStatus('Error connecting to server');
+      setStatus('Error connecting to server ' + err);
     }
   };
 
@@ -114,7 +114,7 @@ export function Entries({ selectedUserId }: EntriesProps) {
         alert(`Error: ${data.error}`);
       }
     } catch (err) {
-      alert('Error connecting to server');
+      alert(`Error connecting to server\n ${err}`);
     }
   };
 

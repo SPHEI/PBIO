@@ -59,7 +59,7 @@ export function Register({ setCurrentView }: RegisterProps) {
         setRegStatus(`Error: ${data.error}`);
       }
     } catch (err) {
-      setRegStatus('Error connecting to server');
+      setRegStatus('Error connecting to server ' + err);
     }
   };
 

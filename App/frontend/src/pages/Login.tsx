@@ -42,7 +42,7 @@ export function Login({ setCurrentView }: LoginProps) {
         setLoginStatus(`Error: ${data.error || 'Invalid credentials'}`);
       }
     } catch (err) {
-      setLoginStatus('Error connecting to server');
+      setLoginStatus('Error connecting to server ' + err);
     }
   };
 

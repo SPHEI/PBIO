@@ -16,11 +16,11 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json({message: "Welcome to the backend. Functions available under /api"});
+  res.status(200).json({message: "Welcome to the backend. Functions available under /api"});
 });
 
 app.get('/api', (req, res) => {
-  res.json({
+  res.status(200).json({
     message: "Welcome to the api. Here you can see all available routes.",
     base: [
       "GET  / - Welcome message",
@@ -46,7 +46,7 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({status: "ok"});
+  res.status(200).json({status: "ok"});
 });
 
 app.use('/api', accountRoutes);
