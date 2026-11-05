@@ -23,15 +23,15 @@ Polecenie instaluje wymagane biblioteki po czym uruchamia aplikacje.
 Przy pierwszym uruchomieniu zostanie automatycznie stworzona baza danych. Do bazy zostanie dodany admin z hasłem zdefiniowanym w pliku ```.env```. Jeśli plik .env nie istnieje to zostanie utworzony bazując na ```.env```.example.
 
 **Pozostałe komendy:**
-```npm run setup_env``` Tworzy plik .env jeśli nie istnieje.
-```npm run install_all``` Instaluje wymagane biblioteki oraz tworzy .env jeśli nie istnieje.
-```npm run server``` Tworzy bazę danych jeśli nie istnieje i uruchamia serwer.
-```npm run client``` Uruchamia stronę.
-```npm run dev``` Jednocześnie uruchamia serwer i stronę.
+* ```npm run setup_env``` Tworzy plik .env jeśli nie istnieje.
+* ```npm run install_all``` Instaluje wymagane biblioteki oraz tworzy .env jeśli nie istnieje.
+* ```npm run server``` Tworzy bazę danych jeśli nie istnieje i uruchamia serwer.
+* ```npm run client``` Uruchamia stronę.
+* ```npm run dev``` Jednocześnie uruchamia serwer i stronę.
 
 ## Adresy
-Frontend/Strona -   http://localhost:3000/
-Backend/API -       http://localhost:5000/
+* Frontend/Strona -   http://localhost:3000/
+* Backend/API -       http://localhost:5000/
 
 ## Endpointy
 Wszystkie adresy zaczynają się od http://localhost:5000
