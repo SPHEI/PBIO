@@ -4,7 +4,7 @@ interface LoginProps {
   setCurrentView: (view: string) => void;
 }
 
-export function Login({setCurrentView }: LoginProps) {
+export function Login({ setCurrentView }: LoginProps) {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loginStatus, setLoginStatus] = useState<string>('');
@@ -21,19 +21,16 @@ export function Login({setCurrentView }: LoginProps) {
       });
 
       const data = await response.json();
-      console.log(data)
 
       if (response.ok) {
         setLoginStatus('Login successful!');
-        console.log(data.token)
         localStorage.setItem('username', data.username);
         localStorage.setItem('token', data.token);
-        if(data.admin === true)
-        {
-            localStorage.setItem('admin', data.username);
+        if (data.admin === true) {
+          localStorage.setItem('admin', data.username);
         }
         window.dispatchEvent(new Event('auth-change'));
-        setCurrentView("home")
+        setCurrentView("home");
       } else {
         setLoginStatus(`Error: ${data.error || 'Invalid credentials'}`);
       }
@@ -42,16 +39,27 @@ export function Login({setCurrentView }: LoginProps) {
     }
   };
 
+  const inputStyle = {
+    padding: '8px',
+    fontSize: '1rem',
+    borderRadius: '4px',
+    border: '1px solid #444',
+    backgroundColor: '#2a2a2a',
+    color: '#f1f1f1',
+    boxSizing: 'border-box' as const,
+    width: '100%',
+  };
+
   return (
-    <div>
+    <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto', color: '#f1f1f1' }}>
       <h2>Login</h2>
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: '8px', fontSize: '1rem' }}
+          style={inputStyle}
           required
         />
         <input
@@ -59,7 +67,7 @@ export function Login({setCurrentView }: LoginProps) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: '8px', fontSize: '1rem' }}
+          style={inputStyle}
           required
         />
         <button
@@ -72,12 +80,25 @@ export function Login({setCurrentView }: LoginProps) {
             cursor: 'pointer',
             fontSize: '1rem',
             borderRadius: '4px',
+            fontWeight: 'bold',
           }}
         >
           Login
         </button>
       </form>
-      {loginStatus && <p style={{ marginTop: '10px' }}>{loginStatus}</p>}
+      {loginStatus && (
+        <p
+          style={{
+            marginTop: '12px',
+            fontSize: '0.95rem',
+            color: loginStatus.includes('Error') ? '#ff6b6b' : '#f1f1f1',
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+          }}
+        >
+          {loginStatus}
+        </p>
+      )}
     </div>
   );
 }

@@ -8,11 +8,11 @@ interface Entry {
   income: boolean;
 }
 
-
 interface EntriesProps {
   selectedUserId: string;
 }
-export function Entries({selectedUserId} : EntriesProps) {
+
+export function Entries({ selectedUserId }: EntriesProps) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [name, setName] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
@@ -26,8 +26,7 @@ export function Entries({selectedUserId} : EntriesProps) {
     try {
       const token = localStorage.getItem('token');
       let userId = '';
-      if(localStorage.getItem('admin') !== null)
-      {
+      if (localStorage.getItem('admin') !== null) {
         userId = "?userId=" + selectedUserId;
       }
       const response = await fetch('/api/entries' + userId, {
@@ -58,8 +57,7 @@ export function Entries({selectedUserId} : EntriesProps) {
     try {
       const token = localStorage.getItem('token');
       let userId = null;
-      if(localStorage.getItem('admin') !== null)
-      {
+      if (localStorage.getItem('admin') !== null) {
         userId = selectedUserId;
       }
       const response = await fetch('/api/entries', {
@@ -131,8 +129,19 @@ export function Entries({selectedUserId} : EntriesProps) {
 
   const balance = totalIncome - totalExpense;
 
+  // Reusable input style for dark mode
+  const inputStyle = {
+    padding: '8px',
+    fontSize: '1rem',
+    borderRadius: '4px',
+    border: '1px solid #444',
+    backgroundColor: '#2a2a2a',
+    color: '#f1f1f1',
+    boxSizing: 'border-box' as const,
+  };
+
   return (
-    <div>
+    <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', color: '#f1f1f1' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2>My Entries</h2>
         <button
@@ -143,25 +152,25 @@ export function Entries({selectedUserId} : EntriesProps) {
         </button>
       </div>
 
-      {/* Balance Summary Card */}
+      {/* Balance Summary Cards - Dark Mode */}
       <div style={{ display: 'flex', gap: '15px', marginBottom: '2rem' }}>
-        <div style={{ flex: 1, background: '#f1f3f5', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
-          <span style={{ fontSize: '0.85rem', color: '#666' }}>Total Balance</span>
-          <h3 style={{ margin: '5px 0 0 0', color: balance >= 0 ? '#28a745' : '#dc3545' }}>
+        <div style={{ flex: 1, background: '#1e1e1e', border: '1px solid #333', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', color: '#aaa' }}>Total Balance</span>
+          <h3 style={{ margin: '5px 0 0 0', color: balance >= 0 ? '#28a745' : '#ff6b6b' }}>
             ${balance.toFixed(2)}
           </h3>
         </div>
-        <div style={{ flex: 1, background: '#e6f4ea', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
-          <span style={{ fontSize: '0.85rem', color: '#137333' }}>Total Income</span>
-          <h3 style={{ margin: '5px 0 0 0', color: '#137333' }}>+${totalIncome.toFixed(2)}</h3>
+        <div style={{ flex: 1, background: '#162219', border: '1px solid #234229', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', color: '#57ab5a' }}>Total Income</span>
+          <h3 style={{ margin: '5px 0 0 0', color: '#57ab5a' }}>+${totalIncome.toFixed(2)}</h3>
         </div>
-        <div style={{ flex: 1, background: '#fce8e6', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
-          <span style={{ fontSize: '0.85rem', color: '#c5221f' }}>Total Expense</span>
-          <h3 style={{ margin: '5px 0 0 0', color: '#c5221f' }}>-${totalExpense.toFixed(2)}</h3>
+        <div style={{ flex: 1, background: '#251616', border: '1px solid #5c2b2b', padding: '15px', borderRadius: '6px', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', color: '#ff6b6b' }}>Total Expense</span>
+          <h3 style={{ margin: '5px 0 0 0', color: '#ff6b6b' }}>-${totalExpense.toFixed(2)}</h3>
         </div>
       </div>
 
-      {/* Modal Popup Overlay */}
+      {/* Modal Popup Overlay - Dark Mode */}
       {isModalOpen && (
         <div style={{
           position: 'fixed',
@@ -169,29 +178,31 @@ export function Entries({selectedUserId} : EntriesProps) {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 1000,
         }}>
           <div style={{
-            background: 'white',
-            padding: '20px',
+            background: '#1e1e1e',
+            color: '#f1f1f1',
+            padding: '24px',
             borderRadius: '8px',
             width: '100%',
             maxWidth: '400px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+            border: '1px solid #333',
             position: 'relative'
           }}>
-            <h3>Add New Entry</h3>
-            <form onSubmit={handleAddEntry} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
+            <h3 style={{ marginTop: 0 }}>Add New Entry</h3>
+            <form onSubmit={handleAddEntry} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '15px' }}>
               <input
                 type="text"
                 placeholder="Entry Name (e.g. Salary, Rent)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                style={{ padding: '8px', fontSize: '1rem' }}
+                style={inputStyle}
               />
               <input
                 type="number"
@@ -199,20 +210,20 @@ export function Entries({selectedUserId} : EntriesProps) {
                 placeholder="Amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                style={{ padding: '8px', fontSize: '1rem' }}
+                style={inputStyle}
                 required
               />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <label style={{ fontSize: '0.9rem', color: '#555' }}>Date</label>
+                <label style={{ fontSize: '0.9rem', color: '#bbb' }}>Date</label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  style={{ padding: '8px', fontSize: '1rem' }}
+                  style={inputStyle}
                   required
                 />
               </div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: '#ccc' }}>
                 <input
                   type="checkbox"
                   checked={income}
@@ -222,51 +233,53 @@ export function Entries({selectedUserId} : EntriesProps) {
               </label>
 
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button type="submit" style={{ flex: 1, padding: '10px', background: '#28A745', color: 'white', border: 'none', cursor: 'pointer', fontSize: '1rem', borderRadius: '4px' }}>
+                <button type="submit" style={{ flex: 1, padding: '10px', background: '#28A745', color: 'white', border: 'none', cursor: 'pointer', fontSize: '1rem', borderRadius: '4px', fontWeight: 'bold' }}>
                   Save Entry
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  style={{ flex: 1, padding: '10px', background: '#6C757D', color: 'white', border: 'none', cursor: 'pointer', fontSize: '1rem', borderRadius: '4px' }}
+                  style={{ flex: 1, padding: '10px', background: '#495057', color: 'white', border: 'none', cursor: 'pointer', fontSize: '1rem', borderRadius: '4px' }}
                 >
                   Cancel
                 </button>
               </div>
-              {status && <p style={{ margin: '5px 0', fontSize: '0.9rem', color: 'red' }}>{status}</p>}
+              {status && <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#ff6b6b' }}>{status}</p>}
             </form>
           </div>
         </div>
       )}
 
-      {/* Entries List */}
-      <h3>Stored Entries</h3>
-      {entries.length === 0 ? (
-        <p style={{ color: '#666' }}>No entries found.</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {entries.map((entry) => (
-            <li key={entry.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee', marginBottom: '8px' }}>
-              <div>
-                <strong>{entry.name}</strong> —{' '}
-                <span style={{ color: entry.income ? 'green' : 'red', fontWeight: 'bold' }}>
-                  {entry.income ? '+' : '-'}${entry.amount.toFixed(2)}
-                </span>
-                <br />
-                <span style={{ fontSize: '0.8rem', color: '#666' }}>
-                  {new Date(entry.date).toLocaleString()}
-                </span>
-              </div>
-              <button
-                onClick={() => handleDeleteEntry(entry.id)}
-                style={{ padding: '5px 10px', background: '#DC3545', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      {/* Entries List Centered Section - Dark Mode */}
+      <div style={{ width: '100%', maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
+        <h3>Stored Entries</h3>
+        {entries.length === 0 ? (
+          <p style={{ color: '#aaa' }}>No entries found.</p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, textAlign: 'left' }}>
+            {entries.map((entry) => (
+              <li key={entry.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#1e1e1e', border: '1px solid #333', borderRadius: '6px', marginBottom: '8px' }}>
+                <div>
+                  <strong style={{ color: '#fff' }}>{entry.name}</strong> —{' '}
+                  <span style={{ color: entry.income ? '#57ab5a' : '#ff6b6b', fontWeight: 'bold' }}>
+                    {entry.income ? '+' : '-'}${entry.amount.toFixed(2)}
+                  </span>
+                  <br />
+                  <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
+                    {new Date(entry.date).toLocaleString()}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleDeleteEntry(entry.id)}
+                  style={{ padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

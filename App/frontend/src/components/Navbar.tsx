@@ -12,7 +12,7 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
     cursor: 'pointer',
     fontSize: '1rem',
     fontWeight: isActive ? 'bold' : 'normal',
-    color: isActive ? '#007BFF' : '#333',
+    color: isActive ? '#007BFF' : '#555',
     padding: '5px 10px',
   });
 
@@ -45,14 +45,58 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
   };
 
   return (
-    <nav style={{ display: 'flex', gap: '15px', padding: '1rem 0', borderBottom: '1px solid #ccc', marginBottom: '2rem' }}>
-      <button onClick={() => setCurrentView('home')} style={navBtnStyle(currentView === 'home')}>Home</button>
-      {!loggedIn && <button onClick={() => setCurrentView('login')} style={navBtnStyle(currentView === 'login')}>Login</button>}
-      {!loggedIn && <button onClick={() => setCurrentView('register')} style={navBtnStyle(currentView === 'register')}>Register</button>}
-      {admin && <button onClick={() => setCurrentView('dashboard')} style={navBtnStyle(currentView === 'dashboard')}>Users Dashboard</button>}
-      {loggedIn && !admin && <button onClick={() => setCurrentView('entries')} style={navBtnStyle(currentView === 'entries')}>Entries</button>}
-      {loggedIn && <button onClick={() => setCurrentView('account')} style={navBtnStyle(false)}>Account</button>}
-      {loggedIn && <button onClick={logout} style={navBtnStyle(false)}>Logout</button>}
+    <nav
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '1rem 0',
+        borderBottom: '1px solid #ccc',
+        marginBottom: '2rem',
+      }}
+    >
+      {/* Left Navigation Items */}
+      <div style={{ display: 'flex', gap: '15px' }}>
+        <button onClick={() => setCurrentView('home')} style={navBtnStyle(currentView === 'home')}>
+          Home
+        </button>
+        {admin && (
+          <button onClick={() => setCurrentView('dashboard')} style={navBtnStyle(currentView === 'dashboard')}>
+            Users Dashboard
+          </button>
+        )}
+        {loggedIn && !admin && (
+          <button onClick={() => setCurrentView('entries')} style={navBtnStyle(currentView === 'entries')}>
+            Entries
+          </button>
+        )}
+      </div>
+
+      {/* Right Navigation / Auth Items */}
+      <div style={{ display: 'flex', gap: '15px' }}>
+        {!loggedIn && (
+          <button onClick={() => setCurrentView('login')} style={navBtnStyle(currentView === 'login')}>
+            Login
+          </button>
+        )}
+        {!loggedIn && (
+          <button onClick={() => setCurrentView('register')} style={navBtnStyle(currentView === 'register')}>
+            Register
+          </button>
+        )}
+        {loggedIn && (
+          <button onClick={() => setCurrentView('account')} style={navBtnStyle(currentView === 'account')}>
+            Account
+          </button>
+        )}
+        {loggedIn && (
+          <button onClick={logout} style={navBtnStyle(false)}>
+            Logout
+          </button>
+        )}
+      </div>
     </nav>
   );
 }

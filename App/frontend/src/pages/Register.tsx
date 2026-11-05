@@ -4,7 +4,7 @@ interface RegisterProps {
   setCurrentView: (view: string) => void;
 }
 
-export function Register({setCurrentView }: RegisterProps) {
+export function Register({ setCurrentView }: RegisterProps) {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repassword, setRepassword] = useState<string>('');
@@ -31,9 +31,9 @@ export function Register({setCurrentView }: RegisterProps) {
           setUsername('');
           setPassword('');
           setRepassword('');
-          alert('Account created succesfully.')
+          alert('Account created successfully.');
           
-          setCurrentView("login")
+          setCurrentView("login");
         } else {
           setRegStatus(`Error: ${data.error}`);
         }
@@ -43,16 +43,27 @@ export function Register({setCurrentView }: RegisterProps) {
     }
   };
 
+  const inputStyle = {
+    padding: '8px',
+    fontSize: '1rem',
+    borderRadius: '4px',
+    border: '1px solid #444',
+    backgroundColor: '#2a2a2a',
+    color: '#f1f1f1',
+    boxSizing: 'border-box' as const,
+    width: '100%',
+  };
+
   return (
-    <div>
+    <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto', color: '#f1f1f1' }}>
       <h2>Register New User</h2>
-      <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: '8px', fontSize: '1rem' }}
+          style={inputStyle}
           required
         />
         <input
@@ -60,7 +71,7 @@ export function Register({setCurrentView }: RegisterProps) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: '8px', fontSize: '1rem' }}
+          style={inputStyle}
           required
         />
         <input
@@ -68,7 +79,7 @@ export function Register({setCurrentView }: RegisterProps) {
           placeholder="Repeat Password"
           value={repassword}
           onChange={(e) => setRepassword(e.target.value)}
-          style={{ padding: '8px', fontSize: '1rem' }}
+          style={inputStyle}
           required
         />
         <button
@@ -81,12 +92,25 @@ export function Register({setCurrentView }: RegisterProps) {
             cursor: 'pointer',
             fontSize: '1rem',
             borderRadius: '4px',
+            fontWeight: 'bold',
           }}
         >
           Register User
         </button>
       </form>
-      {regStatus && <p style={{ marginTop: '10px' }}>{regStatus}</p>}
+      {regStatus && (
+        <p
+          style={{
+            marginTop: '12px',
+            fontSize: '0.95rem',
+            color: regStatus.includes('Error') ? '#ff6b6b' : '#57ab5a',
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+          }}
+        >
+          {regStatus}
+        </p>
+      )}
     </div>
   );
 }

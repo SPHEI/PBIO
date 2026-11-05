@@ -20,7 +20,7 @@ function App() {
   }, []);
 
   return (
-    <div style={{ fontFamily: 'sans-serif', maxWidth: '600px', margin: 'auto' }}>
+    <div style={{ fontFamily: 'sans-serif', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', margin: 'auto', alignItems: 'center' }}>
       <Navbar currentView={currentView} setCurrentView={setCurrentView} />
 
       {currentView === 'home' && <Home message={message} />}
