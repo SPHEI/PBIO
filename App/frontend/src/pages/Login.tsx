@@ -16,6 +16,7 @@ export function Login({ setCurrentView }: LoginProps) {
     try {
       const response = await fetch('/api/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
@@ -25,7 +26,6 @@ export function Login({ setCurrentView }: LoginProps) {
       if (response.ok) {
         setLoginStatus('Login successful!');
         localStorage.setItem('username', data.username);
-        localStorage.setItem('token', data.token);
         if (data.admin === true) {
           localStorage.setItem('admin', data.username);
         }

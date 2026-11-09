@@ -20,7 +20,7 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
   const [admin, setAdmin] = useState<boolean>(false);
 
   const refresh = () => {
-    setLoggedIn(localStorage.getItem('token') !== null);
+    setLoggedIn(localStorage.getItem('username') !== null);
     setAdmin(localStorage.getItem('admin') !== null);
   };
 
@@ -37,7 +37,6 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
 
   const logout = () => {
     localStorage.removeItem('username');
-    localStorage.removeItem('token');
     localStorage.removeItem('admin');
 
     window.dispatchEvent(new Event('auth-change'));
@@ -62,7 +61,7 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
         <button onClick={() => setCurrentView('home')} style={navBtnStyle(currentView === 'home')}>
           Home
         </button>
-        {admin && (
+        {loggedIn && admin && (
           <button onClick={() => setCurrentView('dashboard')} style={navBtnStyle(currentView === 'dashboard')}>
             Users Dashboard
           </button>

@@ -24,15 +24,12 @@ export function Entries({ selectedUserId }: EntriesProps) {
   // Fetch entries on load
   const fetchEntries = async () => {
     try {
-      const token = localStorage.getItem('token');
       let userId = '';
       if (localStorage.getItem('admin') !== null) {
         userId = "?userId=" + selectedUserId;
       }
       const response = await fetch('/api/entries' + userId, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
       const data = await response.json();
       if (response.ok) {
@@ -55,16 +52,15 @@ export function Entries({ selectedUserId }: EntriesProps) {
     setStatus('Adding entry...');
 
     try {
-      const token = localStorage.getItem('token');
       let userId = null;
       if (localStorage.getItem('admin') !== null) {
         userId = selectedUserId;
       }
       const response = await fetch('/api/entries', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: name || 'Transfer',
@@ -99,12 +95,9 @@ export function Entries({ selectedUserId }: EntriesProps) {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`/api/entries/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (response.ok) {

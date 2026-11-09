@@ -8,8 +8,7 @@ export interface AuthRequest extends Request {
 
 // 1. Verify standard JWT token
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = req.cookies?.token;
 
   if (!token) {
     return res.status(401).json({ error: 'Access token missing or malformed' });
@@ -17,7 +16,7 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
 
   const secret = process.env.JWT_SECRET || 'fallback_secret_key';
 
-  jwt.verify(token, secret, (err, decoded) => {
+  jwt.verify(token, secret, (err: any, decoded: any) => {
     if (err) {
       return res.status(403).json({ error: 'Invalid or expired token' });
     }

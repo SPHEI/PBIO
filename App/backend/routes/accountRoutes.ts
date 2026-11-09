@@ -103,9 +103,16 @@ router.post('/login', async (req: Request, res: Response) => {
       { expiresIn: '2h' }
     );
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 2 * 60 * 60 * 1000,
+    });
+
     res.json({
       message: 'Login successful',
-      token, // Send token back to the client
       userId: user.id,
       username: user.username,
       admin: user.admin

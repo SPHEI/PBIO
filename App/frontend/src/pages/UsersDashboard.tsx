@@ -11,15 +11,9 @@ export function UsersDashboard({ setCurrentView, setSelectedUserId }: UsersDashb
 
   const handleGetUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (token === null) {
-        alert('No token');
-      } else {
         const response = await fetch('/api/users', {
           method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          credentials: 'include',
         });
         const data = await response.json();
         if (response.ok) {
@@ -27,7 +21,7 @@ export function UsersDashboard({ setCurrentView, setSelectedUserId }: UsersDashb
         } else {
           alert(data.error || 'An error occurred');
         }
-      }
+      
     } catch (err) {
       console.error('Error connecting to server', err);
     }
@@ -43,12 +37,9 @@ export function UsersDashboard({ setCurrentView, setSelectedUserId }: UsersDashb
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
       const data = await response.json();
 

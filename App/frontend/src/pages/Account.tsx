@@ -44,12 +44,11 @@ export function Account({ setCurrentView }: AccountProps) {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('/api/password', {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ oldPassword, newPassword }),
       });
@@ -62,7 +61,6 @@ export function Account({ setCurrentView }: AccountProps) {
         setNewPassword('');
         setConfirmNewPassword('');
 
-        localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('admin');
         window.dispatchEvent(new Event('auth-change'));
@@ -79,12 +77,11 @@ export function Account({ setCurrentView }: AccountProps) {
     setDeleteStatus(null);
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('/api/account', {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ password: deletePassword }),
       });
@@ -94,7 +91,6 @@ export function Account({ setCurrentView }: AccountProps) {
       if (response.ok) {
         alert('Your account and all associated entries have been deleted.');
 
-        localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('admin');
         window.dispatchEvent(new Event('auth-change'));
