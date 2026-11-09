@@ -7,6 +7,23 @@ import { UsersDashboard } from './pages/UsersDashboard';
 import { Entries } from './pages/Entries';
 import { Account } from './pages/Account';
 
+
+const originalFetch = window.fetch;
+
+window.fetch = async function (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+  init.credentials = 'include';
+  let response = await originalFetch(input, init);
+
+  if (response.status === 401) {
+      alert("Invalid token, please log in again.");
+      localStorage.removeItem('username');
+      localStorage.removeItem('admin');
+      window.dispatchEvent(new Event('auth-change'));
+      window.location.reload();
+  }
+  return response;
+};
+
 function App() {
   const [currentView, setCurrentView] = useState<string>('home');
   const [selectedUserId, setSelectedUserId] = useState<string>('home');

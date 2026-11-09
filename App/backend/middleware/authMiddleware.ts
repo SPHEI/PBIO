@@ -18,7 +18,7 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
 
   jwt.verify(token, secret, (err: any, decoded: any) => {
     if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
+      return res.status(403).json({ error: 'Invalid or expired token' , relog: true});
     }
 
     req.user = decoded as { userId: string; username: string; admin: boolean };

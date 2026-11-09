@@ -85,14 +85,14 @@ router.post('/login', async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(400).json({ error: 'Invalid username or password' });
     }
 
     // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(400).json({ error: 'Invalid username or password' });
     }
 
     // Generate a JWT token (expires in 2 hours)
@@ -150,7 +150,7 @@ router.put('/password', verifyToken, async (req: AuthRequest, res: Response) => 
     // Verify old password
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Incorrect old password' });
+      return res.status(400).json({ error: 'Incorrect old password' });
     }
 
     // Hash the new password
@@ -191,7 +191,7 @@ router.delete('/account', verifyToken, async (req: AuthRequest, res: Response) =
     // Verify current password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Incorrect password' });
+      return res.status(400).json({ error: 'Incorrect password' });
     }
 
     // Delete associated entries and user account in a transaction
