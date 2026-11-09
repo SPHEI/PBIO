@@ -1,5 +1,5 @@
 ## Cel
-Celem aplikacji jest zapewnienie użytkownikom środowiska w którym mogą przechowywać, sprawdzać, oraz analizować swoje zyski oraz wydatki.
+Celem aplikacji jest zapewnienie użytkownikom środowiska w którym mogą przechowywać i sprawdzać swoje zyski oraz wydatki.
 ## Rodzaje możliwości użytkowników
 * **Użytkownik niezalogowany**
     Jedyne co ten użytkownik może zrobić to się zalogować lub założyć konto.
@@ -7,14 +7,13 @@ Celem aplikacji jest zapewnienie użytkownikom środowiska w którym mogą przec
     Użytkownik może:
     * dodawać/usuwać własne zyski/wydatki
     * sprawdzać historię swoich zysków/wydatków (z sortowaniem/filtrami)
-    * oglądać statystyki związane z własnym kontem
     * wylogować się 
     * zmienić swoje hasło
     * usunąć swoje konto
 * **Admin**
     Admin może:
     * wyszukiwać użytkowników (z sortowaniem/filtrami)
-    * oglądać zyski/wydatki/statystyki wszyskich użytkowników 
+    * oglądać zyski/wydatki wszyskich użytkowników 
     * sprawdzać historię zysków/wydatków wszyskich użytkowników (z sortowaniem/filtrami)
     * dodawać/usuwać zyski/wydatki wszystkich użytkowników
     * usuwać konta
@@ -23,7 +22,6 @@ Celem aplikacji jest zapewnienie użytkownikom środowiska w którym mogą przec
 * **Rejestracja i logowanie**: Użytkownik może założyć konto przy użyciu loginu i hasła.
 * **Dodawanie/usuwanie zysków/wydatków**: Użytkownik może dodać swój zysk/wydatek wraz z nazwą, datą oraz notatką/komentarzem. Wpisy mogą również zostać usunięte.
 * **Sprawdzanie historii**: Użytkownik może sprawdzić swoje wpisy z wybranego zakresu dat. Wpisy może sortować oraz filtrować wg nazwy, daty, ilości lub komentarza.
-* **Generowanie statystyk**: System automatycznie generuje statystyki bazując na historii użytkownika. Te statystyki może obejżeć użytkownik.
 * **Wyszukiwanie użytkowników**: Administrator może wyszukiwać użytkowników po nazwie. Dodatkowo wyniki może sortować wg nazwy użytkownika, ilości wpisów, daty dołączenia lub daty ostatniego logowania.
 * **Usuwanie kont**: System pozwala na usuwanie kont użytkowników. Konto może zostać usunięte tylko poprzez administratora oraz użytkownika, do którego należy konto.
 * **Baza danych**: System przechowuje dane w bazie danych. Z bazy wyciągane są tylko potrzebne dane do wykonania zadania.
@@ -31,7 +29,7 @@ Celem aplikacji jest zapewnienie użytkownikom środowiska w którym mogą przec
 * Hasła użytkowników muszą być zaszyfrowane/zhashowane w bazie danych.
 * Dane logowania powinny być zaszyfrowane/zhashowane przed wysłaniem do backendu.
 * Użytkownik powinien mieć dostęp tylko do własnych wpisów. Wpisy innych użytkowników nie powinny dochodzić do frontendu.
-* Usunięcie użytkownika powinno również usunąć powiązane z nimi dane - wpisy i wygenerowane statystyki.
+* Usunięcie użytkownika powinno również usunąć powiązane z nimi dane.
 * Użytkownicy nie powinni mieć dostępu do panelu administratora, oraz nie powinni mieć możliwości wywołania funkcjonalności na backendzie.
 * Baza danych powinna być chroniona przed nieuprawnonym dostępem.
 * Administratorzy muszą potwierdzać każdą akcję. System powinien przechowywać logi każdej akcji dokonanej przez administratora.
