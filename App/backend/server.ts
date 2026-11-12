@@ -85,3 +85,5 @@ app.listen(PORT, async () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   await createDefaultAdmin();
 });
+
+export default app;
