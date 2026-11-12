@@ -40,6 +40,8 @@ describe("POST /api/login", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
+    process.env.JWT_SECRET = "test_jwt_secret";
+
     // Clear mock database
     mocks.users.length = 0;
 
@@ -62,6 +64,7 @@ describe("POST /api/login", () => {
     });
   });
 
+  // TEST 1: Successful login
   it("should successfully log in an existing user", async () => {
     const response = await request(app)
       .post("/api/login")
@@ -98,5 +101,101 @@ describe("POST /api/login", () => {
     expect(response.headers["set-cookie"]).toBeDefined();
     expect(response.headers["set-cookie"][0]).toContain("token=");
     expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
+  });
+
+  // TEST 2: Missing username
+  it("should reject login when username is missing", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({
+        password,
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Username and password are required",
+    });
+
+    // Database should not be queried
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+
+    // No authentication cookie should be issued
+    expect(response.headers["set-cookie"]).toBeUndefined();
+  });
+
+  // TEST 3: Missing password
+  it("should reject login when password is missing", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({
+        username,
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Username and password are required",
+    });
+
+    // Database should not be queried
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+
+    // No authentication cookie should be issued
+    expect(response.headers["set-cookie"]).toBeUndefined();
+  });
+
+  // TEST 4: Nonexistent username
+  it("should reject login when username does not exist", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({
+        username: "nonexistent_user",
+        password,
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Invalid username or password",
+    });
+
+    // Verify Prisma searched for the requested username
+    expect(mocks.findUnique).toHaveBeenCalledOnce();
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: {
+        username: "nonexistent_user",
+      },
+    });
+
+    // No authentication cookie should be issued
+    expect(response.headers["set-cookie"]).toBeUndefined();
+  });
+
+  // TEST 5: Incorrect password
+  it("should reject login when password is incorrect", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({
+        username,
+        password: "WrongPassword123!",
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Invalid username or password",
+    });
+
+    // Verify Prisma found the existing user
+    expect(mocks.findUnique).toHaveBeenCalledOnce();
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: { username },
+    });
+
+    // No authentication cookie should be issued
+    expect(response.headers["set-cookie"]).toBeUndefined();
   });
 });

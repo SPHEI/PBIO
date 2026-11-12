@@ -54,7 +54,6 @@ describe("DELETE /api/account", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    // Set JWT secret for login and authentication
     process.env.JWT_SECRET = "test_jwt_secret";
 
     // Clear in-memory database
@@ -117,14 +116,13 @@ describe("DELETE /api/account", () => {
     });
 
     // Mock Prisma transaction
-    mocks.transaction.mockImplementation(async (operations) => {
+    mocks.transaction.mockImplementation(async operations => {
       return Promise.all(operations);
     });
   });
 
-  it("should delete an authenticated user's account and associated entries", async () => {
-
-    // STEP 1: Log in to obtain a real JWT token
+  // Helper: log in and obtain a real JWT authentication cookie
+  async function getAuthCookie(): Promise<string> {
     const loginResponse = await request(app)
       .post("/api/login")
       .send({
@@ -132,7 +130,7 @@ describe("DELETE /api/account", () => {
         password,
       });
 
-    expect(loginResponse.status).toBe(200);
+    expect(loginResponse.status, JSON.stringify(loginResponse.body)).toBe(200);
 
     expect(loginResponse.body).toMatchObject({
       message: "Login successful",
@@ -140,7 +138,6 @@ describe("DELETE /api/account", () => {
       username,
     });
 
-    // Extract JWT authentication cookie
     const cookies = loginResponse.headers["set-cookie"];
 
     expect(cookies).toBeDefined();
@@ -151,35 +148,35 @@ describe("DELETE /api/account", () => {
 
     expect(tokenCookie).toBeDefined();
 
+    return tokenCookie!;
+  }
 
-    // STEP 2: Verify mock database is populated
+  // TEST 1: Successful account deletion
+  it("should delete an authenticated user's account and associated entries", async () => {
+    const token = await getAuthCookie();
+
+    // Verify mock database population
     expect(mocks.users).toHaveLength(1);
     expect(mocks.entries).toHaveLength(3);
-
-    expect(mocks.users[0].password).not.toBe(password);
 
     expect(
       await bcrypt.compare(password, mocks.users[0].password)
     ).toBe(true);
 
-
-    // STEP 3: Delete account using JWT token
+    // Delete account
     const response = await request(app)
       .delete("/api/account")
-      .set("Cookie", tokenCookie!)
-      .send({
-        password,
-      });
+      .set("Cookie", token)
+      .send({ password });
 
-    // STEP 4: Check HTTP response
+    // Check HTTP response
     expect(response.status, JSON.stringify(response.body)).toBe(200);
 
     expect(response.body).toEqual({
       message: "Account and associated data deleted successfully",
     });
 
-
-    // STEP 5: Verify Prisma found the user
+    // Verify Prisma user lookups
     expect(mocks.findUnique).toHaveBeenCalledWith({
       where: { username },
     });
@@ -188,37 +185,23 @@ describe("DELETE /api/account", () => {
       where: { id: userId },
     });
 
-
-    // STEP 6: Verify password comparison
-    // The login and account deletion should both verify the password.
-    expect(
-      await bcrypt.compare(password, mocks.users[0]?.password ?? "")
-    ).toBe(false);
-
-    // Verify transaction was executed
+    // Verify transaction
     expect(mocks.transaction).toHaveBeenCalledOnce();
 
-
-    // STEP 7: Verify associated entries were deleted
+    // Verify associated entries were deleted
     expect(mocks.deleteMany).toHaveBeenCalledWith({
-      where: {
-        user_id: userId,
-      },
+      where: { user_id: userId },
     });
 
-
-    // STEP 8: Verify user was deleted
+    // Verify user was deleted
     expect(mocks.deleteUser).toHaveBeenCalledWith({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
     });
 
-
-    // STEP 9: Verify final in-memory database state
+    // Verify final database state
     expect(mocks.users).toHaveLength(0);
 
-    // Only entries belonging to other users should remain
+    // Only another user's entry should remain
     expect(mocks.entries).toHaveLength(1);
 
     expect(mocks.entries[0]).toEqual({
@@ -226,5 +209,114 @@ describe("DELETE /api/account", () => {
       user_id: 999,
       content: "Another user's entry",
     });
+  });
+
+  // TEST 2: Missing password
+  it("should reject account deletion when password is missing", async () => {
+    const token = await getAuthCookie();
+
+    // Clear login-related Prisma calls
+    mocks.findUnique.mockClear();
+
+    const response = await request(app)
+      .delete("/api/account")
+      .set("Cookie", token)
+      .send({});
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Current password is required to delete your account",
+    });
+
+    // No database lookup or deletion should happen
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+    expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
+    expect(mocks.deleteUser).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.users).toHaveLength(1);
+    expect(mocks.entries).toHaveLength(3);
+  });
+
+  // TEST 3: Incorrect current password
+  it("should reject account deletion when the current password is incorrect", async () => {
+    const token = await getAuthCookie();
+
+    // Clear login-related Prisma calls
+    mocks.findUnique.mockClear();
+
+    const response = await request(app)
+      .delete("/api/account")
+      .set("Cookie", token)
+      .send({
+        password: "WrongPassword123!",
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Incorrect password",
+    });
+
+    // Verify Prisma found the authenticated user
+    expect(mocks.findUnique).toHaveBeenCalledOnce();
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: { id: userId },
+    });
+
+    // No deletion should happen
+    expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
+    expect(mocks.deleteUser).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.users).toHaveLength(1);
+    expect(mocks.entries).toHaveLength(3);
+
+    // Original password remains valid
+    expect(
+      await bcrypt.compare(password, mocks.users[0].password)
+    ).toBe(true);
+  });
+
+  // TEST 4: User no longer exists in the database
+  it("should return 404 when the authenticated user no longer exists", async () => {
+    const token = await getAuthCookie();
+
+    // Remove user from mock database while keeping their entries
+    mocks.users.length = 0;
+
+    // Clear login-related Prisma calls
+    mocks.findUnique.mockClear();
+
+    const response = await request(app)
+      .delete("/api/account")
+      .set("Cookie", token)
+      .send({ password });
+
+    expect(response.status).toBe(404);
+
+    expect(response.body).toEqual({
+      error: "User not found",
+    });
+
+    // Verify Prisma attempted to find the user
+    expect(mocks.findUnique).toHaveBeenCalledOnce();
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: { id: userId },
+    });
+
+    // No deletion should happen
+    expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
+    expect(mocks.deleteUser).not.toHaveBeenCalled();
+
+    // Entries remain untouched
+    expect(mocks.users).toHaveLength(0);
+    expect(mocks.entries).toHaveLength(3);
   });
 });

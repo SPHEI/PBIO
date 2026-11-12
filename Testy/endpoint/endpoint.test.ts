@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 
 // PBIO/app directory
 const appDir = fileURLToPath(
-  new URL("../app/", import.meta.url)
+  new URL("../../app/", import.meta.url)
 );
 
 const PORT = 4317;

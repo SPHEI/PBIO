@@ -29,8 +29,10 @@ describe("POST /api/register", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    // Default: username does not exist
     mocks.findUnique.mockResolvedValue(null);
 
+    // Mock successful database insertion
     mocks.create.mockImplementation(async ({ data }) => ({
       id: 123,
       username: data.username,
@@ -38,6 +40,7 @@ describe("POST /api/register", () => {
     }));
   });
 
+  // TEST 1: Successful registration
   it("should register a user and send the correct data to Prisma", async () => {
     const username = `testuser_${Date.now()}`;
     const password = "StrongPassword123!";
@@ -49,7 +52,6 @@ describe("POST /api/register", () => {
         password,
       });
 
-    // Check HTTP response
     expect(response.status).toBe(201);
 
     expect(response.body).toEqual({
@@ -70,19 +72,109 @@ describe("POST /api/register", () => {
 
     const databaseData = mocks.create.mock.calls[0][0].data;
 
-    // Check exact username sent to Prisma
     expect(databaseData.username).toBe(username);
 
-    // Check that password was hashed before being sent to Prisma
+    // Password must be hashed
     expect(databaseData.password).toEqual(expect.any(String));
     expect(databaseData.password).not.toBe(password);
 
-    // Check the complete data received by Prisma
+    // Check exact data received by Prisma
     expect(mocks.create).toHaveBeenCalledWith({
       data: {
         username,
         password: databaseData.password,
       },
     });
+  });
+
+  // TEST 2: Missing username
+  it("should reject registration when username is missing", async () => {
+    const response = await request(app)
+      .post("/api/register")
+      .send({
+        password: "StrongPassword123!",
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Username and password are required",
+    });
+
+    // Database should not be queried or modified
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  // TEST 3: Missing password
+  it("should reject registration when password is missing", async () => {
+    const response = await request(app)
+      .post("/api/register")
+      .send({
+        username: "testuser",
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Username and password are required",
+    });
+
+    // Database should not be queried or modified
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  // TEST 4: Invalid password
+  it("should reject registration when password does not meet validation rules", async () => {
+    const response = await request(app)
+      .post("/api/register")
+      .send({
+        username: "testuser",
+        password: "short",
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body.error).toEqual(expect.any(String));
+
+    // Validation happens before checking the database
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  // TEST 5: Username already exists
+  it("should reject registration when username is already taken", async () => {
+    const username = "existinguser";
+
+    // Simulate an existing database user
+    mocks.findUnique.mockResolvedValue({
+      id: 456,
+      username,
+      password: "existing_hashed_password",
+    });
+
+    const response = await request(app)
+      .post("/api/register")
+      .send({
+        username,
+        password: "StrongPassword123!",
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Username is already taken",
+    });
+
+    // Verify Prisma checked the username
+    expect(mocks.findUnique).toHaveBeenCalledOnce();
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: { username },
+    });
+
+    // Existing user must not be overwritten
+    expect(mocks.create).not.toHaveBeenCalled();
   });
 });

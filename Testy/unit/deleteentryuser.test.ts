@@ -219,4 +219,46 @@ describe("DELETE /api/entries/:id", () => {
       user_id: adminUser.id,
     });
   });
+
+  // TEST 2: Attempt to delete a nonexistent entry
+  it("should return 404 when the entry does not exist", async () => {
+    const token = await getAuthCookie(
+      regularUser.username,
+      regularUser.password
+    );
+
+    // Clear login-related entry lookup history
+    mocks.findEntryUnique.mockClear();
+
+    const response = await request(app)
+      .delete("/api/entries/nonexistent-entry")
+      .set("Cookie", token);
+
+    expect(response.status).toBe(404);
+
+    expect(response.body).toEqual({
+      error: "Entry not found",
+    });
+
+    // Verify Prisma searched for the requested ID
+    expect(mocks.findEntryUnique).toHaveBeenCalledOnce();
+
+    expect(mocks.findEntryUnique).toHaveBeenCalledWith({
+      where: { id: "nonexistent-entry" },
+    });
+
+    // No deletion should occur
+    expect(mocks.deleteEntry).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.entries).toHaveLength(2);
+
+    expect(
+      mocks.entries.find(entry => entry.id === "entry-regular")
+    ).toBeDefined();
+
+    expect(
+      mocks.entries.find(entry => entry.id === "entry-admin")
+    ).toBeDefined();
+  });
 });

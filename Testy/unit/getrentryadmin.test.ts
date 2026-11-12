@@ -176,26 +176,22 @@ describe("GET /api/entries", () => {
     return tokenCookie!;
   }
 
-  // Admin can fetch entries belonging to a specified user
+  // TEST 1: Admin can fetch entries belonging to a specified user
   it("should allow an admin to fetch entries of a specified user", async () => {
-    // STEP 1: Log in as admin
     const token = await getAuthCookie(
       adminUser.username,
       adminUser.password
     );
 
-    // STEP 2: Request regular user's entries
     const response = await request(app)
       .get("/api/entries")
       .query({ userId: regularUser.id })
       .set("Cookie", token);
 
-    // STEP 3: Check HTTP response
     expect(response.status).toBe(200);
 
     expect(response.body).toHaveLength(2);
 
-    // Admin should receive the specified user's entries
     expect(response.body).toEqual([
       {
         id: "entry-2",
@@ -215,7 +211,6 @@ describe("GET /api/entries", () => {
       },
     ]);
 
-    // STEP 4: Verify Prisma received the requested user ID
     expect(mocks.findMany).toHaveBeenCalledOnce();
 
     expect(mocks.findMany).toHaveBeenCalledWith({
@@ -227,26 +222,22 @@ describe("GET /api/entries", () => {
       },
     });
 
-    // Verify results belong to the requested user
     for (const entry of response.body) {
       expect(entry.user_id).toBe(regularUser.id);
     }
   });
 
-  //  Admin without userId defaults to their own entries
+  // TEST 2: Admin without userId defaults to their own entries
   it("should return the admin's own entries when no userId is provided", async () => {
-    // STEP 1: Log in as admin
     const token = await getAuthCookie(
       adminUser.username,
       adminUser.password
     );
 
-    // STEP 2: Request entries without userId
     const response = await request(app)
       .get("/api/entries")
       .set("Cookie", token);
 
-    // STEP 3: Check HTTP response
     expect(response.status).toBe(200);
 
     expect(response.body).toHaveLength(1);
@@ -259,7 +250,6 @@ describe("GET /api/entries", () => {
       user_id: adminUser.id,
     });
 
-    // STEP 4: Verify Prisma queried the admin's own entries
     expect(mocks.findMany).toHaveBeenCalledWith({
       where: {
         user_id: adminUser.id,
@@ -268,5 +258,72 @@ describe("GET /api/entries", () => {
         date: "desc",
       },
     });
+  });
+
+  // TEST 3: Nonexistent userId
+  it("should return an empty array when the requested user does not exist", async () => {
+    const token = await getAuthCookie(
+      adminUser.username,
+      adminUser.password
+    );
+
+    const nonexistentUserId = "nonexistent-user-999";
+
+    const response = await request(app)
+      .get("/api/entries")
+      .query({ userId: nonexistentUserId })
+      .set("Cookie", token);
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toEqual([]);
+
+    // Verify Prisma searched for the requested ID
+    expect(mocks.findMany).toHaveBeenCalledOnce();
+
+    expect(mocks.findMany).toHaveBeenCalledWith({
+      where: {
+        user_id: nonexistentUserId,
+      },
+      orderBy: {
+        date: "desc",
+      },
+    });
+
+    // Original database remains unchanged
+    expect(mocks.entries).toHaveLength(3);
+  });
+
+  // TEST 4: Empty userId
+  it("should return an empty array when the admin supplies an empty userId", async () => {
+    const token = await getAuthCookie(
+      adminUser.username,
+      adminUser.password
+    );
+
+    const response = await request(app)
+      .get("/api/entries")
+      .query({ userId: "" })
+      .set("Cookie", token);
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toEqual([]);
+
+    // Empty string is still a string, so the route uses it
+    // instead of defaulting to the admin's own user ID.
+    expect(mocks.findMany).toHaveBeenCalledOnce();
+
+    expect(mocks.findMany).toHaveBeenCalledWith({
+      where: {
+        user_id: "",
+      },
+      orderBy: {
+        date: "desc",
+      },
+    });
+
+    // Original database remains unchanged
+    expect(mocks.entries).toHaveLength(3);
   });
 });

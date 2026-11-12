@@ -276,7 +276,6 @@ describe("DELETE /api/users/:id", () => {
 
   // TEST 2: Admin cannot delete their own account
   it("should prevent an admin from deleting their own account", async () => {
-    // Log in as admin
     const token = await getAuthCookie(
       adminUser.username,
       adminUser.password
@@ -285,7 +284,6 @@ describe("DELETE /api/users/:id", () => {
     // Clear login-related Prisma calls
     mocks.findUnique.mockClear();
 
-    // Attempt to delete own account
     const response = await request(app)
       .delete(`/api/users/${adminUser.id}`)
       .set("Cookie", token);
@@ -313,6 +311,8 @@ describe("DELETE /api/users/:id", () => {
       adminUser.password
     );
 
+    mocks.findUnique.mockClear();
+
     const response = await request(app)
       .delete("/api/users/nonexistent-user")
       .set("Cookie", token);
@@ -321,6 +321,51 @@ describe("DELETE /api/users/:id", () => {
 
     expect(response.body).toEqual({
       error: "User not found",
+    });
+
+    // Verify lookup was performed
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: {
+        id: "nonexistent-user",
+      },
+    });
+
+    // No deletion should occur
+    expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
+    expect(mocks.deleteUser).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.users).toHaveLength(2);
+    expect(mocks.entries).toHaveLength(3);
+  });
+
+  // TEST 4: Admin provides an invalid user ID
+  it("should reject a user ID containing only whitespace", async () => {
+    const token = await getAuthCookie(
+      adminUser.username,
+      adminUser.password
+    );
+
+    mocks.findUnique.mockClear();
+
+    const response = await request(app)
+      .delete("/api/users/%20")
+      .set("Cookie", token);
+
+    expect(response.status).toBe(404);
+
+    expect(response.body).toEqual({
+      error: "User not found",
+    });
+
+    // Verify Prisma received the whitespace ID
+
+    expect(mocks.findUnique).toHaveBeenCalledWith({
+      where: {
+        id: " ",
+      },
     });
 
     // No deletion should occur

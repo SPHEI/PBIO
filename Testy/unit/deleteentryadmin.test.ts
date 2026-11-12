@@ -172,34 +172,30 @@ describe("DELETE /api/entries/:id", () => {
     return tokenCookie!;
   }
 
-  // Admin deletes another user's entry
+  // TEST 1: Admin deletes another user's entry
   it("should allow an admin to delete another user's entry", async () => {
     const token = await getAuthCookie(
       adminUser.username,
       adminUser.password
     );
 
-    // Verify the logged-in user is an admin
-    expect(mocks.users.find(user => user.id === adminUser.id)?.admin)
-      .toBe(true);
+    expect(mocks.users).toHaveLength(2);
+    expect(mocks.entries).toHaveLength(2);
 
     const response = await request(app)
       .delete("/api/entries/entry-regular")
       .set("Cookie", token);
 
-    // Check HTTP response
     expect(response.status).toBe(200);
 
     expect(response.body).toEqual({
       message: "Entry deleted successfully",
     });
 
-    // Verify Prisma searched for the correct entry
     expect(mocks.findEntryUnique).toHaveBeenCalledWith({
       where: { id: "entry-regular" },
     });
 
-    // Verify Prisma deleted the entry
     expect(mocks.deleteEntry).toHaveBeenCalledOnce();
 
     expect(mocks.deleteEntry).toHaveBeenCalledWith({
@@ -218,5 +214,42 @@ describe("DELETE /api/entries/:id", () => {
       id: "entry-admin",
       user_id: adminUser.id,
     });
+  });
+
+  // TEST 2: Entry does not exist
+  it("should return 404 when trying to delete a nonexistent entry", async () => {
+    const token = await getAuthCookie(
+      adminUser.username,
+      adminUser.password
+    );
+
+    const response = await request(app)
+      .delete("/api/entries/nonexistent-entry")
+      .set("Cookie", token);
+
+    expect(response.status).toBe(404);
+
+    expect(response.body).toEqual({
+      error: "Entry not found",
+    });
+
+    // Verify Prisma searched for the requested entry
+    expect(mocks.findEntryUnique).toHaveBeenCalledWith({
+      where: { id: "nonexistent-entry" },
+    });
+
+    // No deletion should occur
+    expect(mocks.deleteEntry).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.entries).toHaveLength(2);
+
+    expect(
+      mocks.entries.find(entry => entry.id === "entry-regular")
+    ).toBeDefined();
+
+    expect(
+      mocks.entries.find(entry => entry.id === "entry-admin")
+    ).toBeDefined();
   });
 });

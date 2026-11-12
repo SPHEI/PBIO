@@ -100,12 +100,8 @@ describe("POST /api/entries", () => {
     });
   });
 
-  it("should create a new entry for an authenticated user", async () => {
-    const entryName = "Test expense";
-    const amount = "125.50";
-    const date = "2026-11-12T10:00:00.000Z";
-
-    // STEP 1: Log in to obtain a real JWT token
+  // Helper: log in and obtain a real JWT authentication cookie
+  async function getAuthCookie(): Promise<string> {
     const loginResponse = await request(app)
       .post("/api/login")
       .send({
@@ -115,13 +111,6 @@ describe("POST /api/entries", () => {
 
     expect(loginResponse.status).toBe(200);
 
-    expect(loginResponse.body).toMatchObject({
-      message: "Login successful",
-      userId,
-      username,
-    });
-
-    // Extract JWT authentication cookie
     const cookies = loginResponse.headers["set-cookie"];
 
     expect(cookies).toBeDefined();
@@ -132,7 +121,18 @@ describe("POST /api/entries", () => {
 
     expect(tokenCookie).toBeDefined();
 
-    // STEP 2: Verify mock database is populated
+    return tokenCookie!;
+  }
+
+  // TEST 1: Successful entry creation
+  it("should create a new entry for an authenticated user", async () => {
+    const tokenCookie = await getAuthCookie();
+
+    const entryName = "Test expense";
+    const amount = "125.50";
+    const date = "2026-11-12T10:00:00.000Z";
+
+    // Verify mock database population
     expect(mocks.users).toHaveLength(1);
     expect(mocks.entries).toHaveLength(1);
 
@@ -140,10 +140,10 @@ describe("POST /api/entries", () => {
       await bcrypt.compare(password, mocks.users[0].password)
     ).toBe(true);
 
-    // STEP 3: Create entry using the JWT token
+    // Create entry using JWT token
     const response = await request(app)
       .post("/api/entries")
-      .set("Cookie", tokenCookie!)
+      .set("Cookie", tokenCookie)
       .send({
         name: entryName,
         amount,
@@ -151,12 +151,12 @@ describe("POST /api/entries", () => {
         income: true,
       });
 
-    // STEP 4: Check HTTP response
+    // Check HTTP response
     expect(response.status, JSON.stringify(response.body)).toBe(201);
 
     expect(response.body.message).toBe("Entry created successfully");
 
-    // STEP 5: Verify Prisma received the correct data
+    // Verify Prisma received the correct data
     expect(mocks.createEntry).toHaveBeenCalledOnce();
 
     expect(mocks.createEntry).toHaveBeenCalledWith({
@@ -169,7 +169,7 @@ describe("POST /api/entries", () => {
       },
     });
 
-    // STEP 6: Verify returned entry
+    // Verify returned entry
     expect(response.body.entry).toMatchObject({
       id: 456,
       name: entryName,
@@ -179,7 +179,7 @@ describe("POST /api/entries", () => {
       date,
     });
 
-    // STEP 7: Verify in-memory database contains the new entry
+    // Verify in-memory database
     expect(mocks.entries).toHaveLength(2);
 
     expect(mocks.entries[1]).toMatchObject({
@@ -191,5 +191,52 @@ describe("POST /api/entries", () => {
     });
 
     expect(mocks.entries[1].date).toEqual(new Date(date));
+  });
+
+  // TEST 2: Missing amount
+  it("should reject entry creation when amount is missing", async () => {
+    const tokenCookie = await getAuthCookie();
+
+    const response = await request(app)
+      .post("/api/entries")
+      .set("Cookie", tokenCookie)
+      .send({
+        name: "Invalid expense",
+        income: false,
+      });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      error: "Amount is required",
+    });
+
+    // Prisma must not receive a creation request
+    expect(mocks.createEntry).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.entries).toHaveLength(1);
+  });
+
+  // TEST 3: Non-numeric amount
+  it("should reject entry creation when amount is not a valid number", async () => {
+    const tokenCookie = await getAuthCookie();
+
+    const response = await request(app)
+      .post("/api/entries")
+      .set("Cookie", tokenCookie)
+      .send({
+        name: "Invalid expense",
+        amount: "not-a-number",
+        income: false,
+      });
+
+    expect(response.status).toBe(400);
+
+    // Prisma must not receive a creation request
+    expect(mocks.createEntry).not.toHaveBeenCalled();
+
+    // Database remains unchanged
+    expect(mocks.entries).toHaveLength(1);
   });
 });

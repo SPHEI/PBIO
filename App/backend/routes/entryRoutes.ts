@@ -9,7 +9,9 @@ router.post('/entries', verifyToken, async (req: AuthRequest, res: Response) => 
   try {
     const { name, amount, date, income, targetUserId } = req.body;
 
-    if (amount === undefined) {
+    const amountFloat = parseFloat(amount);
+
+    if (amount === undefined || isNaN(amountFloat)) {
       return res.status(400).json({ error: 'Amount is required' });
     }
 
@@ -24,7 +26,7 @@ router.post('/entries', verifyToken, async (req: AuthRequest, res: Response) => 
     const newEntry = await prisma.entry.create({
       data: {
         name: name || 'Transfer',
-        amount: parseFloat(amount),
+        amount: amountFloat,
         date: date ? new Date(date) : undefined,
         income: income ?? false,
         user_id: userIdToUse,
