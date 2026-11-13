@@ -63,3 +63,15 @@ curl -X POST http://localhost:5000/api/register \
   -H "Content-Type: application/json" \
   -d '{"username": "myusername", "password": "mypassword"}'
 ```
+
+# Testowanie
+Projekt wykorzystuje Vitest oraz Supertest.
+
+Aby przeprowadzić testy należy otworzyć terminal w folderze app po czym wykonać komendę:
+```npm run tests```
+
+Komenda wymaga zainstalowania bibliotek (```npm run install_all``` - automatycznie wykonane, jeśli aplikacja była już wcześniej uruchamiana).
+
+Testy pokrywają wszystkie endpointy dostępne na backendzie, z wyjątkiem / oraz /api. Funkcje testowane są dla poprawnych oraz błędnych danych.
+
+Testy wykorzystują symulowaną bazę danych - nie modyfikują bazy danych używanej przez samą aplikację.
