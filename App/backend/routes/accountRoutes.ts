@@ -146,7 +146,6 @@ router.put('/password', verifyToken, async (req: AuthRequest, res: Response) => 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
     // Verify old password
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
