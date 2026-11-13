@@ -65,7 +65,7 @@ curl -X POST http://localhost:5000/api/register \
 ```
 
 # Testowanie
-Projekt wykorzystuje Vitest oraz Supertest.
+Projekt wykorzystuje **Vitest** oraz **Supertest**.
 
 Aby przeprowadzić testy należy otworzyć terminal w folderze app po czym wykonać komendę:
 ```npm run tests```
