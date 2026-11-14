@@ -106,6 +106,7 @@ describe("POST /api/register", () => {
     expect(mocks.create).not.toHaveBeenCalled();
   });
 
+  // TEST 3: Invalid email
   it("should reject registration when username is not a valid email address", async () => {
     const response = await request(app)
       .post("/api/register")
@@ -119,7 +120,7 @@ describe("POST /api/register", () => {
     expect(mocks.create).not.toHaveBeenCalled();
   });
 
-  // TEST 3: Missing password
+  // TEST 4: Missing password
   it("should reject registration when password is missing", async () => {
     const response = await request(app)
       .post("/api/register")
@@ -138,7 +139,7 @@ describe("POST /api/register", () => {
     expect(mocks.create).not.toHaveBeenCalled();
   });
 
-  // TEST 4: Invalid password
+  // TEST 5: Invalid password
   it("should reject registration when password does not meet validation rules", async () => {
     const response = await request(app)
       .post("/api/register")
@@ -156,7 +157,7 @@ describe("POST /api/register", () => {
     expect(mocks.create).not.toHaveBeenCalled();
   });
 
-  // TEST 5: Username already exists
+  // TEST 6: Username already exists
   it("should reject registration when username is already taken", async () => {
     const username = "existinguser@example.com";
 
