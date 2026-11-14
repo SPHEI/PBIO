@@ -23,6 +23,9 @@ const validatePassword = (password: string): string | null => {
   return null;
 };
 
+const isValidEmail = (email: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 // 1. POST: Create a new user (Sign Up) with password hashing
 router.post('/register', async (req: Request, res: Response) => {
   try {
@@ -30,6 +33,10 @@ router.post('/register', async (req: Request, res: Response) => {
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    if (typeof username !== 'string' || !isValidEmail(username)) {
+      return res.status(400).json({ error: 'Username must be a valid email address' });
     }
 
     // Validate password rules

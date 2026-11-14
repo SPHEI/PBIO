@@ -62,8 +62,9 @@ export function Login({ setCurrentView }: LoginProps) {
       <h2>Login</h2>
       <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <input
-          type="text"
-          placeholder="Username"
+          type="email"
+          placeholder="Email address"
+          autoComplete="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           style={inputStyle}

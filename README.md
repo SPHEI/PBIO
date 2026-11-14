@@ -57,11 +57,11 @@ Windows:
 Invoke-RestMethod -Uri "http://localhost:5000/api/register" `
   -Method Post `
   -ContentType "application/json" `
-  -Body '{"username": "myusername", "password": "mypassword"}'
+  -Body '{"username": "user@example.com", "password": "mypassword"}'
 Linux:
 curl -X POST http://localhost:5000/api/register \
   -H "Content-Type: application/json" \
-  -d '{"username": "myusername", "password": "mypassword"}'
+  -d '{"username": "user@example.com", "password": "mypassword"}'
 ```
 
 # Testowanie

@@ -14,6 +14,11 @@ export function Register({ setCurrentView }: RegisterProps) {
     e.preventDefault();
     setRegStatus('');
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) {
+      setRegStatus('Error: Enter a valid email address');
+      return;
+    }
+
     // Password validation rules
     if (password.length < 6) {
       setRegStatus('Error: Password must be at least 6 characters long');
@@ -77,10 +82,11 @@ export function Register({ setCurrentView }: RegisterProps) {
   return (
     <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto', color: '#f1f1f1' }}>
       <h2>Register New User</h2>
-      <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <form noValidate onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <input
-          type="text"
-          placeholder="Username"
+          type="email"
+          placeholder="Email address"
+          autoComplete="email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           style={inputStyle}

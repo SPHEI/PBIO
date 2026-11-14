@@ -49,14 +49,14 @@ app.use("/api", entryRoutes);
 describe("DELETE /api/entries/:id", () => {
   const regularUser = {
     id: 123,
-    username: "regularuser",
+    username: "regularuser@example.com",
     password: "RegularPassword123!",
     admin: false,
   };
 
   const adminUser = {
     id: 456,
-    username: "adminuser",
+    username: "adminuser@example.com",
     password: "AdminPassword123!",
     admin: true,
   };

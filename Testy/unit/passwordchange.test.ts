@@ -40,7 +40,7 @@ app.use(cookieParser());
 app.use("/api", accountRoutes);
 
 describe("PUT /api/password", () => {
-  const username = "testuser";
+  const username = "testuser@example.com";
   const oldPassword = "OldPassword123!";
   const newPassword = "NewPassword456!";
   const userId = 123;

@@ -107,7 +107,7 @@ describe("User password change integration", () => {
     const upasswordhash = await bcrypt.hash("UserPassword123!", 10);
     const user = {
       id: "user-2",
-      username: "regular-user",
+      username: "regular-user@example.com",
       password: upasswordhash,
       admin: false,
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
@@ -116,7 +116,7 @@ describe("User password change integration", () => {
 
     const login = await request(app)
       .post("/api/login")
-      .send({ username: "regular-user", password: "UserPassword123!" });
+      .send({ username: "regular-user@example.com", password: "UserPassword123!" });
     expect(login.status, JSON.stringify(login.body)).toBe(200);
 
     const cookie = login.headers["set-cookie"];
@@ -134,7 +134,7 @@ describe("User password change integration", () => {
 
     const login2 = await request(app)
       .post("/api/login")
-      .send({ username: "regular-user", password: "NewPassword123!" });
+      .send({ username: "regular-user@example.com", password: "NewPassword123!" });
     expect(login2.status, JSON.stringify(login2.body)).toBe(200);
 
     const cookie2 = login.headers["set-cookie"];

@@ -51,14 +51,14 @@ app.use("/api", adminRoutes);
 describe("DELETE /api/users/:id", () => {
   const adminUser = {
     id: "admin-123",
-    username: "adminuser",
+    username: "adminuser@example.com",
     password: "AdminPassword123!",
     admin: true,
   };
 
   const regularUser = {
     id: "user-456",
-    username: "regularuser",
+    username: "regularuser@example.com",
     password: "RegularPassword123!",
     admin: false,
   };

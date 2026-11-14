@@ -102,7 +102,7 @@ describe("User everything integration", () => {
   });
 
   it("registers, logs in, adds an entry, retrieves it, deletes it, adds another entry, changes password, logs in again, and deletes the account", async () => {
-    const username = `testuser_${Date.now()}`;
+    const username = `testuser_${Date.now()}@example.com`;
     const password = "StrongPassword123!";
 
     const registration = await request(app).post("/api/register").send({ username, password });

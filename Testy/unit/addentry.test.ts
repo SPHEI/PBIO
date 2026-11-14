@@ -45,7 +45,7 @@ app.use("/api", accountRoutes);
 app.use("/api", entryRoutes);
 
 describe("POST /api/entries", () => {
-  const username = "entry_test_user";
+  const username = "entry_test_user@example.com";
   const password = "StrongPassword123!";
   const userId = 123;
 

@@ -42,7 +42,7 @@ describe("POST /api/register", () => {
 
   // TEST 1: Successful registration
   it("should register a user and send the correct data to Prisma", async () => {
-    const username = `testuser_${Date.now()}`;
+    const username = `testuser_${Date.now()}@example.com`;
     const password = "StrongPassword123!";
 
     const response = await request(app)
@@ -106,12 +106,25 @@ describe("POST /api/register", () => {
     expect(mocks.create).not.toHaveBeenCalled();
   });
 
+  it("should reject registration when username is not a valid email address", async () => {
+    const response = await request(app)
+      .post("/api/register")
+      .send({ username: "not-an-email", password: "StrongPassword123!" });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: "Username must be a valid email address",
+    });
+    expect(mocks.findUnique).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
   // TEST 3: Missing password
   it("should reject registration when password is missing", async () => {
     const response = await request(app)
       .post("/api/register")
       .send({
-        username: "testuser",
+        username: "testuser@example.com",
       });
 
     expect(response.status).toBe(400);
@@ -130,7 +143,7 @@ describe("POST /api/register", () => {
     const response = await request(app)
       .post("/api/register")
       .send({
-        username: "testuser",
+        username: "testuser@example.com",
         password: "short",
       });
 
@@ -145,7 +158,7 @@ describe("POST /api/register", () => {
 
   // TEST 5: Username already exists
   it("should reject registration when username is already taken", async () => {
-    const username = "existinguser";
+    const username = "existinguser@example.com";
 
     // Simulate an existing database user
     mocks.findUnique.mockResolvedValue({

@@ -106,7 +106,7 @@ describe("Admin entry deletion integration", () => {
     const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
     const user = {
       id: "user-2",
-      username: "regular-user",
+      username: "regular-user@example.com",
       password: await bcrypt.hash("UserPassword123!", 10),
       admin: false,
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
@@ -134,7 +134,7 @@ describe("Admin entry deletion integration", () => {
 
     const login = await request(app)
       .post("/api/login")
-      .send({ username: "admin", password: adminPassword });
+      .send({ username: "admin@example.com", password: adminPassword });
     expect(login.status, JSON.stringify(login.body)).toBe(200);
 
     const cookie = login.headers["set-cookie"];

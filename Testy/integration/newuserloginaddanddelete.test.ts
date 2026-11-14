@@ -102,7 +102,7 @@ describe("New user integration", () => {
   });
 
   it("registers, logs in, adds an entry, retrieves it, and deletes it", async () => {
-    const username = `testuser_${Date.now()}`;
+    const username = `testuser_${Date.now()}@example.com`;
     const password = "StrongPassword123!";
 
     const registration = await request(app).post("/api/register").send({ username, password });

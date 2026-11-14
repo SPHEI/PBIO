@@ -47,14 +47,14 @@ app.use("/api", entryRoutes);
 describe("GET /api/entries - User access restrictions", () => {
   const regularUser = {
     id: "user-123",
-    username: "regularuser",
+    username: "regularuser@example.com",
     password: "RegularPassword123!",
     admin: false,
   };
 
   const anotherUser = {
     id: "user-456",
-    username: "anotheruser",
+    username: "anotheruser@example.com",
     password: "AnotherPassword123!",
     admin: false,
   };

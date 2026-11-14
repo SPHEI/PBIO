@@ -47,14 +47,14 @@ app.use("/api", entryRoutes);
 describe("GET /api/entries", () => {
   const regularUser = {
     id: "user-123",
-    username: "regularuser",
+    username: "regularuser@example.com",
     password: "RegularPassword123!",
     admin: false,
   };
 
   const adminUser = {
     id: "admin-456",
-    username: "adminuser",
+    username: "adminuser@example.com",
     password: "AdminPassword123!",
     admin: true,
   };

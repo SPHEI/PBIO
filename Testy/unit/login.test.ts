@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => ({
   findUnique: vi.fn(),
 }));
 
-const username = "testuser";
+const username = "testuser@example.com";
 const password = "StrongPassword123!";
 
 // Mock Prisma with an in-memory database
@@ -150,7 +150,7 @@ describe("POST /api/login", () => {
     const response = await request(app)
       .post("/api/login")
       .send({
-        username: "nonexistent_user",
+        username: "nonexistent_user@example.com",
         password,
       });
 
@@ -165,7 +165,7 @@ describe("POST /api/login", () => {
 
     expect(mocks.findUnique).toHaveBeenCalledWith({
       where: {
-        username: "nonexistent_user",
+        username: "nonexistent_user@example.com",
       },
     });
 

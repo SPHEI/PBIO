@@ -47,7 +47,7 @@ app.use(cookieParser());
 app.use("/api", accountRoutes);
 
 describe("DELETE /api/account", () => {
-  const username = "delete_test_user";
+  const username = "delete_test_user@example.com";
   const password = "StrongPassword123!";
   const userId = 123;
 

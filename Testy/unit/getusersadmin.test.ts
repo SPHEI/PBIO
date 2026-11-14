@@ -44,14 +44,14 @@ app.use("/api", adminRoutes);
 describe("GET /api/users", () => {
   const adminUser = {
     id: 123,
-    username: "adminuser",
+    username: "adminuser@example.com",
     password: "AdminPassword123!",
     admin: true,
   };
 
   const regularUser = {
     id: 456,
-    username: "regularuser",
+    username: "regularuser@example.com",
     password: "RegularPassword123!",
     admin: false,
   };
