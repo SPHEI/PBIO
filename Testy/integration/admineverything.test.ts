@@ -94,7 +94,7 @@ vi.mock("../../App/backend/config/db", () => ({ default: mocks }));
 // Import the Express app without starting a real database connection.
 import app from "../../App/backend/server";
 
-describe("Admin entry deletion integration", () => {
+describe("Admin everything integration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.users.length = 0;
@@ -102,7 +102,7 @@ describe("Admin entry deletion integration", () => {
     process.env.JWT_SECRET = "test_jwt_secret";
   });
 
-  it("logs in as admin, views a user's entries, deletes one of them, deletes the user, changes password, logs in again, and deletes the account", async () => {
+  it("logs in as admin, views all users, views a user's entries, deletes one of them, deletes the user, changes password, logs in again, and deletes the account", async () => {
     const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
     const user = {
       id: "user-2",
@@ -140,6 +140,13 @@ describe("Admin entry deletion integration", () => {
     const cookie = login.headers["set-cookie"];
     expect(cookie[0]).toContain("token=");
     expect(cookie[0]).toContain("HttpOnly");
+
+    const gotusers = await request(app)
+      .get(`/api/users`)
+      .set("Cookie", cookie);
+    expect(gotusers.status, JSON.stringify(gotusers.body)).toBe(200);
+    expect(gotusers.body).toHaveLength(2);
+    expect(gotusers.body.map((id: any) => id.id)).toEqual(['user-1','user-2'])
 
     const listed = await request(app)
       .get(`/api/entries?userId=${user.id}`)

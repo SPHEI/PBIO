@@ -93,7 +93,7 @@ vi.mock("../../App/backend/config/db", () => ({ default: mocks }));
 // Import the Express app without starting a real database connection.
 import app from "../../App/backend/server";
 
-describe("New user integration", () => {
+describe("User everything integration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.users.length = 0;
