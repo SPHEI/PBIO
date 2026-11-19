@@ -7,6 +7,7 @@ import {
 } from "vitest";
 
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { request as httpsRequest } from "node:https";
 import { fileURLToPath } from "node:url";
 
 // PBIO/app directory
@@ -15,13 +16,39 @@ const appDir = fileURLToPath(
 );
 
 const PORT = 4317;
-const HEALTH_URL = `http://127.0.0.1:${PORT}/api/health`;
+const HEALTH_URL = `https://127.0.0.1:${PORT}/api/health`;
 
 let server: ChildProcess | undefined;
 let serverOutput = "";
 let spawnError: Error | undefined;
 
-// Wait until the server responds to HTTP requests
+// Make an HTTPS request to the local server.
+// Certificate verification is disabled only for this test connection.
+function getHealthStatus(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const request = httpsRequest(
+      HEALTH_URL,
+      {
+        method: "GET",
+        rejectUnauthorized: false,
+      },
+      response => {
+        response.resume();
+        resolve(response.statusCode ?? 0);
+      }
+    );
+
+    request.on("error", reject);
+
+    request.setTimeout(5000, () => {
+      request.destroy(new Error("Health request timed out."));
+    });
+
+    request.end();
+  });
+}
+
+// Wait until the server responds to HTTPS requests
 async function waitForServer(timeout = 25000): Promise<void> {
   const deadline = Date.now() + timeout;
 
@@ -37,7 +64,7 @@ async function waitForServer(timeout = 25000): Promise<void> {
     }
 
     try {
-      await fetch(HEALTH_URL);
+      await getHealthStatus();
       return;
     } catch {
       // Server is not ready yet
@@ -112,8 +139,8 @@ describe("Backend server", () => {
   });
 
   it("should return HTTP 200 from the health endpoint", async () => {
-    const response = await fetch(HEALTH_URL);
+    const status = await getHealthStatus();
 
-    expect(response.status).toBe(200);
+    expect(status).toBe(200);
   });
 });

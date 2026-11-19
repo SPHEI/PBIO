@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "setup_env": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env')) { fs.copyFileSync('.env.example', '.env'); console.log('.env file created successfully from example.env.'); } else { console.log('.env file already exists.'); }\"",
+    "cert": "node scripts/create-local-certificates.cjs",
     "install_all": "npm run setup_env && npm install && npm install --prefix frontend",
-    "server": "npx prisma db push && tsx watch backend/server.ts",
-    "client": "npm run dev --prefix frontend",
+    "server": "npm run cert && npx prisma db push && tsx watch backend/server.ts",
+    "client": "npm run cert && npm run dev --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "all": "npm run install_all && npm run dev",
     "test": "vitest --config vitest.config.ts",

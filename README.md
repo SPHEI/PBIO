@@ -7,6 +7,7 @@
 ## Technologie
 * React 
 * Node.js
+* Mkcert
 * Express 
 * SQLite
 * Prisma
@@ -15,11 +16,15 @@ Aplikacja webowa do monitorowania zysków oraz wydatków w celu lepszego budżet
 
 # Uruchamianie i wymagania
 Aplikacja wymaga zainstalowania **node.js** (https://nodejs.org/en).
+Lokalny tryb HTTPS wymaga programu [mkcert](https://github.com/FiloSottile/mkcert).
+
+Przy pierwszym uruchomieniu należy utworzyć lokalny certyfikat CA poleceniem `mkcert -install`. Aplikacja automatycznie utworzy certyfikat dla `localhost`.
 
 Aby uruchomić aplikację należy otworzyć terminal w folderze app po czym wykonać komendę:
 ```npm run all```
 
 Polecenie instaluje wymagane biblioteki po czym uruchamia aplikacje.
+
 Przy pierwszym uruchomieniu zostanie automatycznie stworzona baza danych. Do bazy zostanie dodany admin z hasłem zdefiniowanym w pliku ```.env```. Jeśli plik .env nie istnieje to zostanie utworzony bazując na ```.env```.example.
 
 **Pozostałe komendy:**
@@ -30,11 +35,11 @@ Przy pierwszym uruchomieniu zostanie automatycznie stworzona baza danych. Do baz
 * ```npm run dev``` Jednocześnie uruchamia serwer i stronę.
 
 ## Adresy
-* Frontend/Strona -   http://localhost:3000/
-* Backend/API -       http://localhost:5000/
+* Frontend/Strona -   https://localhost:3000/
+* Backend/API -       https://localhost:5000/
 
 ## Endpointy
-Wszystkie adresy zaczynają się od http://localhost:5000
+Wszystkie adresy zaczynają się od https://localhost:5000
 | Typ | Adres | Funkcja | Dostępność
 |---|---|---|---|
 GET |   /  |    Wiadomość powitalna | Wszyscy
@@ -54,12 +59,12 @@ DELETE |   /api/users  |    Usuwanie konta | Administratorzy
 **Przykładowe żądanie**
 ```
 Windows:
-Invoke-RestMethod -Uri "http://localhost:5000/api/register" `
+Invoke-RestMethod -Uri "https://localhost:5000/api/register" `
   -Method Post `
   -ContentType "application/json" `
   -Body '{"username": "user@example.com", "password": "mypassword"}'
 Linux:
-curl -X POST http://localhost:5000/api/register \
+curl -X POST https://localhost:5000/api/register \
   -H "Content-Type: application/json" \
   -d '{"username": "user@example.com", "password": "mypassword"}'
 ```

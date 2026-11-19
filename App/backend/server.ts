@@ -7,11 +7,15 @@ import adminRoutes from './routes/adminRoutes';
 import bcrypt from 'bcrypt';
 import prisma from './config/db';
 import cookieParser from 'cookie-parser';
+import https from 'node:https';
+import fs from 'node:fs';
+import path from 'node:path';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const certDirectory = path.resolve(__dirname, '../certs');
 
 app.use(cors());
 app.use(express.json());
@@ -81,9 +85,16 @@ async function createDefaultAdmin() {
 }
 
 
-app.listen(PORT, async () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  await createDefaultAdmin();
-});
+const server = process.env.NODE_ENV === 'production'
+  ? app.listen(PORT, onListening)
+  : https.createServer({
+      key: fs.readFileSync(path.join(certDirectory, 'localhost-key.pem')),
+      cert: fs.readFileSync(path.join(certDirectory, 'localhost.pem')),
+    }, app).listen(PORT, onListening);
+
+function onListening() {
+  console.log(`Server is running on ${process.env.NODE_ENV === 'production' ? 'http' : 'https'}://localhost:${PORT}`);
+  void createDefaultAdmin();
+}
 
 export default app;

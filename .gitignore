@@ -18,3 +18,4 @@ Thumbs.db
 .idea/
 /App/node_modules
 *.db
+/App/certs/
