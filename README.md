@@ -15,8 +15,7 @@
 Aplikacja webowa do monitorowania zysków oraz wydatków w celu lepszego budżetowania. Użytkownik będzie mógł zapisywać swoje zyski/wydatki, po czym sprawdzać swój balans oraz proste statystyki np. średni balans na miesiąc.
 
 # Uruchamianie i wymagania
-Aplikacja wymaga zainstalowania **node.js** (https://nodejs.org/en).
-Lokalny tryb HTTPS wymaga programu [mkcert](https://github.com/FiloSottile/mkcert).
+Aplikacja wymaga zainstalowania **node.js** (https://nodejs.org/en) oraz **mkcert** (https://github.com/FiloSottile/mkcert).
 
 Przy pierwszym uruchomieniu należy utworzyć lokalny certyfikat CA poleceniem `mkcert -install`. Aplikacja automatycznie utworzy certyfikat dla `localhost`.
 
