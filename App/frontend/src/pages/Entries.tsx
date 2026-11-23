@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { apiFetch } from '../api';
 
 interface Entry {
   id: string;
@@ -42,7 +43,7 @@ export function Entries({ selectedUserId }: EntriesProps) {
         userId = '?userId=' + encodeURIComponent(selectedUserId);
       }
 
-      const response = await fetch('/api/entries' + userId, {
+      const response = await apiFetch('/api/entries' + userId, {
         credentials: 'include',
       });
 
@@ -75,7 +76,7 @@ export function Entries({ selectedUserId }: EntriesProps) {
         userId = selectedUserId;
       }
 
-      const response = await fetch('/api/entries', {
+      const response = await apiFetch('/api/entries', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -118,7 +119,7 @@ export function Entries({ selectedUserId }: EntriesProps) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/api/entries/${id}`, {
+      const response = await apiFetch(`/api/entries/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });

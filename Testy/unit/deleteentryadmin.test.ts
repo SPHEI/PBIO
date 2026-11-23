@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
 // Mock Prisma
 vi.mock("../../App/backend/config/db", () => ({
   default: {
+    refreshToken: { create: vi.fn(), deleteMany: vi.fn() },
     user: {
       findUnique: mocks.findUserUnique,
     },

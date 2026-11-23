@@ -10,10 +10,15 @@ const appRequire = createRequire(
 );
 
 const bcrypt = appRequire("bcrypt");
+const cookieParser = appRequire("cookie-parser");
 
 const mocks = vi.hoisted(() => ({
   users: [] as any[],
   findUnique: vi.fn(),
+  createRefreshToken: vi.fn(),
+  findRefreshToken: vi.fn(),
+  deleteRefreshToken: vi.fn(),
+  deleteRefreshTokens: vi.fn(),
 }));
 
 const username = "testuser@example.com";
@@ -22,6 +27,13 @@ const password = "StrongPassword123!";
 // Mock Prisma with an in-memory database
 vi.mock("../../App/backend/config/db", () => ({
   default: {
+    refreshToken: {
+      create: mocks.createRefreshToken,
+      findUnique: mocks.findRefreshToken,
+      delete: mocks.deleteRefreshToken,
+      deleteMany: mocks.deleteRefreshTokens,
+    },
+    $transaction: vi.fn(async (operations: Promise<any>[]) => Promise.all(operations)),
     user: {
       findUnique: mocks.findUnique,
     },
@@ -34,11 +46,15 @@ import accountRoutes from "../../App/backend/routes/accountRoutes";
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api", accountRoutes);
 
 describe("POST /api/login", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    mocks.createRefreshToken.mockResolvedValue({});
+    mocks.deleteRefreshToken.mockResolvedValue({});
+    mocks.deleteRefreshTokens.mockResolvedValue({ count: 1 });
 
     process.env.JWT_SECRET = "test_jwt_secret";
 
@@ -101,7 +117,15 @@ describe("POST /api/login", () => {
     expect(response.headers["set-cookie"]).toBeDefined();
     expect(response.headers["set-cookie"][0]).toContain("token=");
     expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
+    expect(response.headers["set-cookie"]).toEqual(expect.arrayContaining([
+      expect.stringContaining("refreshToken="),
+      expect.stringContaining("Max-Age=604800"),
+    ]));
+    expect(mocks.createRefreshToken).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ userId: 123, expiresAt: expect.any(Date) }),
+    }));
   });
+
 
   // TEST 2: Missing username
   it("should reject login when username is missing", async () => {

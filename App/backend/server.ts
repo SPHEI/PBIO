@@ -36,6 +36,8 @@ app.get('/api', (req, res) => {
     accountRoutes: [
       "POST   /api/register - Creates a new user",
       "POST   /api/login - Logs in",
+      "POST   /api/refresh - Rotates refresh token and renews access token",
+      "POST   /api/logout - Logs out and revokes refresh token",
       "PUT    /api/password - Changes password",
       "DELETE /api/account - Deletes account"
     ],

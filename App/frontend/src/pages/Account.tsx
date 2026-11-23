@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiFetch } from '../api';
 
 interface AccountProps {
   setCurrentView: (view: string) => void;
@@ -44,7 +45,7 @@ export function Account({ setCurrentView }: AccountProps) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch('/api/password', {
+      const response = await apiFetch('/api/password', {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -77,7 +78,7 @@ export function Account({ setCurrentView }: AccountProps) {
     setDeleteStatus(null);
 
     try {
-      const response = await fetch('/api/account', {
+      const response = await apiFetch('/api/account', {
         method: 'DELETE',
         credentials: 'include',
         headers: {

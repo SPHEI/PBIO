@@ -89,7 +89,7 @@ const mocks = vi.hoisted(() => {
   return database;
 });
 
-vi.mock("../../App/backend/config/db", () => ({ default: mocks }));
+vi.mock("../../App/backend/config/db", () => ({ default: { ...mocks, refreshToken: { create: vi.fn(), deleteMany: vi.fn(), findUnique: vi.fn(), delete: vi.fn() } } }));
 
 // Import the Express app without starting a real database connection.
 import app from "../../App/backend/server";

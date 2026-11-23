@@ -2,9 +2,25 @@ import { Router, Request, Response } from 'express';
 import prisma from '../config/db';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { createHash, randomBytes } from 'node:crypto';
 import { verifyToken, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
+const ACCESS_TTL_MS = 15 * 60 * 1000;
+const REFRESH_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const refreshHash = (token: string) => createHash('sha256').update(token).digest('hex');
+const issueAccessToken = (user: { id: string; username: string; admin: boolean }) =>
+  jwt.sign({ userId: user.id, username: user.username, admin: user.admin }, process.env.JWT_SECRET || 'fallback_secret_key', { expiresIn: '15m' });
+const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
+  const secure = process.env.NODE_ENV === 'production';
+  res.cookie('token', accessToken, { httpOnly: true, secure, sameSite: 'lax', path: '/', maxAge: ACCESS_TTL_MS });
+  res.cookie('refreshToken', refreshToken, { httpOnly: true, secure, sameSite: 'lax', path: '/api', maxAge: REFRESH_TTL_MS });
+};
+const clearAuthCookies = (res: Response) => {
+  const secure = process.env.NODE_ENV === 'production';
+  res.clearCookie('token', { httpOnly: true, secure, sameSite: 'lax', path: '/' });
+  res.clearCookie('refreshToken', { httpOnly: true, secure, sameSite: 'lax', path: '/api' });
+};
 
 // Helper function to validate password strength
 const validatePassword = (password: string): string | null => {
@@ -102,21 +118,10 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
 
-    // Generate a JWT token (expires in 2 hours)
-    const secret = process.env.JWT_SECRET || 'fallback_secret_key';
-    const token = jwt.sign(
-      { userId: user.id, username: user.username, admin: user.admin },
-      secret,
-      { expiresIn: '2h' }
-    );
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 2 * 60 * 60 * 1000,
-    });
+    const token = issueAccessToken(user);
+    const refreshToken = randomBytes(48).toString('hex');
+    await prisma.refreshToken.create({ data: { tokenHash: refreshHash(refreshToken), userId: user.id, expiresAt: new Date(Date.now() + REFRESH_TTL_MS) } });
+    setAuthCookies(res, token, refreshToken);
 
     res.json({
       message: 'Login successful',
@@ -127,6 +132,41 @@ router.post('/login', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/refresh', async (req: Request, res: Response) => {
+  const oldToken = req.cookies?.refreshToken;
+  if (!oldToken) return res.status(401).json({ error: 'Refresh token missing' });
+  try {
+    const record = await prisma.refreshToken.findUnique({ where: { tokenHash: refreshHash(oldToken) }, include: { user: true } });
+    if (!record || record.expiresAt <= new Date()) {
+      if (record) await prisma.refreshToken.delete({ where: { id: record.id } });
+      clearAuthCookies(res);
+      return res.status(401).json({ error: 'Refresh token invalid or expired' });
+    }
+    const nextToken = randomBytes(48).toString('hex');
+    await prisma.$transaction([
+      prisma.refreshToken.delete({ where: { id: record.id } }),
+      prisma.refreshToken.create({ data: { tokenHash: refreshHash(nextToken), userId: record.userId, expiresAt: new Date(Date.now() + REFRESH_TTL_MS) } }),
+    ]);
+    setAuthCookies(res, issueAccessToken(record.user), nextToken);
+    return res.json({ message: 'Token refreshed' });
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/logout', async (req: Request, res: Response) => {
+  const refreshToken = req.cookies?.refreshToken;
+  try {
+    if (refreshToken) await prisma.refreshToken.deleteMany({ where: { tokenHash: refreshHash(refreshToken) } });
+    clearAuthCookies(res);
+    return res.json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Error logging out:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -168,6 +208,7 @@ router.put('/password', verifyToken, async (req: AuthRequest, res: Response) => 
       where: { id: userId },
       data: { password: hashedNewPassword },
     });
+    await prisma.refreshToken.deleteMany({ where: { userId } });
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {

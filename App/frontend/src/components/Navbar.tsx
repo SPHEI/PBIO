@@ -35,12 +35,16 @@ export function Navbar({ currentView, setCurrentView }: NavbarProps) {
     };
   }, []);
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    } finally {
     localStorage.removeItem('username');
     localStorage.removeItem('admin');
 
     window.dispatchEvent(new Event('auth-change'));
     setCurrentView('home');
+    }
   };
 
   return (

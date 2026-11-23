@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api';
 
 interface UsersDashboardProps {
   setCurrentView: (view: string) => void;
@@ -11,7 +12,7 @@ export function UsersDashboard({ setCurrentView, setSelectedUserId }: UsersDashb
 
   const handleGetUsers = async () => {
     try {
-        const response = await fetch('/api/users', {
+        const response = await apiFetch('/api/users', {
           method: 'GET',
           credentials: 'include',
         });
@@ -37,7 +38,7 @@ export function UsersDashboard({ setCurrentView, setSelectedUserId }: UsersDashb
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await apiFetch(`/api/users/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
