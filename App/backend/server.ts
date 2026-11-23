@@ -77,7 +77,7 @@ async function createDefaultAdmin() {
         },
       });
 
-      console.log('✅ Default admin user created successfully (Username: admin)');
+      console.log('✅ Default admin user created successfully (Email: admin@example.com)');
     }
   } catch (error) {
     console.error('Error seeding default admin:', error);
