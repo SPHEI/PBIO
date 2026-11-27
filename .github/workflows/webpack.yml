@@ -10,7 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      DATABASE_URL: file:./dev.db
+      JWT_SECRET: super_secure_jwt_secret_key_123
       DEFAULT_ADMIN_PASSWORD: admin
+      VITE_API_URL: https://localhost:5000
 
     strategy:
       matrix:
