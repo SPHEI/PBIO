@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DEFAULT_ADMIN_PASSWORD: admin
 
     strategy:
       matrix:

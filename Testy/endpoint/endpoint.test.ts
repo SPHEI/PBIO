@@ -10,9 +10,9 @@ import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { request as httpsRequest } from "node:https";
 import { fileURLToPath } from "node:url";
 
-// PBIO/app directory
+// PBIO/App directory
 const appDir = fileURLToPath(
-  new URL("../../app/", import.meta.url)
+  new URL("../../App/", import.meta.url)
 );
 
 const PORT = 4317;
