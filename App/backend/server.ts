@@ -54,7 +54,7 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({status: "git"});
+  res.status(201).json({status: "ok"});
 });
 
 app.use('/api', accountRoutes);
