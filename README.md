@@ -79,3 +79,10 @@ Komenda wymaga zainstalowania bibliotek (```npm run install_all``` - automatyczn
 Testy pokrywają wszystkie endpointy dostępne na backendzie, z wyjątkiem / oraz /api. Funkcje testowane są dla poprawnych oraz błędnych danych.
 
 Testy wykorzystują symulowaną bazę danych - nie modyfikują bazy danych używanej przez samą aplikację.
+
+# Ciągła Integracja (CI)
+Projekt wykorzystuje **Github Actions** do automatycznego testowania projektu przy każdym push/pull requeście.
+
+Plik z konfiguracją znajduje się w folderze ```.github/workflows```.
+
+Po każdym push/pull requeście narzędzie tworzy środowisko testowe, instaluje zależności, tworzy certyfikaty przy użyciu mkcert, po czym wykonuje testy.
