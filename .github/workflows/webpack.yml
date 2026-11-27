@@ -53,5 +53,5 @@ jobs:
       - name: Run tests
         run: npm run tests
 
-      - name: Build
-        run: npx webpack
+      - name: Build frontend
+        run: npm run build --prefix frontend
