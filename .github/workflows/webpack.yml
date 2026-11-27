@@ -8,6 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      NODE_ENV: test
       DATABASE_URL: file:./dev.db
       JWT_SECRET: super_secure_jwt_secret_key_123
       DEFAULT_ADMIN_PASSWORD: admin

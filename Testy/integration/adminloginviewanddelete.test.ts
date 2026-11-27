@@ -103,7 +103,14 @@ describe("Admin entry deletion integration", () => {
   });
 
   it("logs in as admin, views a user's entries, and deletes one of them", async () => {
-    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "admin123";
+    mocks.users.push({
+      id: "user-1",
+      username: "admin@example.com",
+      password: await bcrypt.hash(adminPassword, 10),
+      admin: true,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
     const user = {
       id: "user-2",
       username: "regular-user@example.com",

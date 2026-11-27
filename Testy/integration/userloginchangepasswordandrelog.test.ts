@@ -104,6 +104,13 @@ describe("User password change integration", () => {
 
 
   it("logs in, changes password, and logs in again", async () => {
+    mocks.users.push({
+      id: "user-1",
+      username: "admin@example.com",
+      password: await bcrypt.hash("admin123", 10),
+      admin: true,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
     const upasswordhash = await bcrypt.hash("UserPassword123!", 10);
     const user = {
       id: "user-2",

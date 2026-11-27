@@ -103,7 +103,14 @@ describe("Admin everything integration", () => {
   });
 
   it("logs in as admin, views all users, views a user's entries, deletes one of them, deletes the user, changes password, logs in again, and deletes the account", async () => {
-    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "admin123";
+    mocks.users.push({
+      id: "user-1",
+      username: "admin@example.com",
+      password: await bcrypt.hash(adminPassword, 10),
+      admin: true,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
     const user = {
       id: "user-2",
       username: "regular-user@example.com",

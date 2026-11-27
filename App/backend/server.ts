@@ -87,12 +87,16 @@ async function createDefaultAdmin() {
 }
 
 
-const server = process.env.NODE_ENV === 'production'
-  ? app.listen(PORT, onListening)
-  : https.createServer({
+if (process.env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV === 'production') {
+    app.listen(PORT, onListening);
+  } else {
+    https.createServer({
       key: fs.readFileSync(path.join(certDirectory, 'localhost-key.pem')),
       cert: fs.readFileSync(path.join(certDirectory, 'localhost.pem')),
     }, app).listen(PORT, onListening);
+  }
+}
 
 function onListening() {
   console.log(`Server is running on ${process.env.NODE_ENV === 'production' ? 'http' : 'https'}://localhost:${PORT}`);

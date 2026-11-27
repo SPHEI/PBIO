@@ -102,6 +102,13 @@ describe("User everything integration", () => {
   });
 
   it("registers, logs in, adds an entry, retrieves it, deletes it, adds another entry, changes password, logs in again, and deletes the account", async () => {
+    mocks.users.push({
+      id: "user-1",
+      username: "admin@example.com",
+      password: await bcrypt.hash("admin123", 10),
+      admin: true,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
     const username = `testuser_${Date.now()}@example.com`;
     const password = "StrongPassword123!";
 

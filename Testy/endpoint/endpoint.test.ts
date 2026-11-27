@@ -95,6 +95,7 @@ describe("Backend server", () => {
         cwd: appDir,
         env: {
           ...process.env,
+          NODE_ENV: "development",
           PORT: String(PORT),
         },
         stdio: ["ignore", "pipe", "pipe"],
